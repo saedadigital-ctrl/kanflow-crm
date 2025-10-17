@@ -10,6 +10,8 @@ import Contacts from "./pages/Contacts";
 import Automations from "./pages/Automations";
 import AIAgents from "./pages/AIAgents";
 import Settings from "./pages/Settings";
+import Messages from "./pages/Messages";
+import Pipeline from "./pages/Pipeline";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
       <Route path={"/automations"} component={Automations} />
       <Route path={"/ai-agents"} component={AIAgents} />
       <Route path={"/settings"} component={Settings} />
+      <Route path={"/messages"} component={Messages} />
+      <Route path={"/pipeline"} component={Pipeline} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
