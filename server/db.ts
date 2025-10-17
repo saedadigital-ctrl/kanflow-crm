@@ -14,7 +14,13 @@ import {
   aiAgents,
   InsertAiAgent,
   whatsappIntegrations,
-  InsertWhatsappIntegration
+  InsertWhatsappIntegration,
+  consents,
+  InsertConsent,
+  auditLogs,
+  InsertAuditLog,
+  lgpdRequests,
+  InsertLgpdRequest
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -324,5 +330,160 @@ export async function deleteWhatsappIntegration(id: string) {
   if (!db) throw new Error("Database not available");
   
   await db.delete(whatsappIntegrations).where(eq(whatsappIntegrations.id, id));
+}
+
+
+
+
+// ============================================
+// SECURITY & LGPD FUNCTIONS
+// ============================================
+
+/**
+ * Create or update user consent
+ */
+export async function upsertConsent(consent: InsertConsent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(consents).values(consent).onDuplicateKeyUpdate({
+    set: {
+      accepted: consent.accepted,
+      acceptedAt: consent.acceptedAt,
+      revokedAt: consent.revokedAt,
+      ipAddress: consent.ipAddress,
+      userAgent: consent.userAgent,
+    },
+  });
+}
+
+/**
+ * Get user consents
+ */
+export async function getUserConsents(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(consents).where(eq(consents.userId, userId));
+}
+
+/**
+ * Check if user has accepted required consents
+ */
+export async function hasAcceptedConsents(userId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const userConsents = await db
+    .select()
+    .from(consents)
+    .where(
+      and(
+        eq(consents.userId, userId),
+        eq(consents.accepted, true)
+      )
+    );
+
+  // Check if user has accepted both terms and privacy
+  const hasTerms = userConsents.some(c => c.type === "terms" && !c.revokedAt);
+  const hasPrivacy = userConsents.some(c => c.type === "privacy" && !c.revokedAt);
+
+  return hasTerms && hasPrivacy;
+}
+
+/**
+ * Create audit log entry
+ */
+export async function createAuditLog(log: InsertAuditLog) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Audit] Database not available, skipping log");
+    return;
+  }
+
+  try {
+    await db.insert(auditLogs).values(log);
+  } catch (error) {
+    console.error("[Audit] Failed to create log:", error);
+  }
+}
+
+/**
+ * Get audit logs with pagination
+ */
+export async function getAuditLogs(options?: {
+  userId?: string;
+  action?: string;
+  resource?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(auditLogs);
+
+  if (options?.userId) {
+    query = query.where(eq(auditLogs.userId, options.userId)) as any;
+  }
+
+  return await query
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(options?.limit || 50)
+    .offset(options?.offset || 0);
+}
+
+/**
+ * Create LGPD request (deletion, portability, correction)
+ */
+export async function createLgpdRequest(request: InsertLgpdRequest) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.insert(lgpdRequests).values(request);
+}
+
+/**
+ * Get LGPD requests
+ */
+export async function getLgpdRequests(options?: {
+  userId?: string;
+  status?: "pending" | "processing" | "completed" | "rejected";
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(lgpdRequests);
+
+  if (options?.userId) {
+    query = query.where(eq(lgpdRequests.userId, options.userId)) as any;
+  }
+
+  if (options?.status) {
+    query = query.where(eq(lgpdRequests.status, options.status)) as any;
+  }
+
+  return await query.orderBy(desc(lgpdRequests.requestedAt));
+}
+
+/**
+ * Update LGPD request status
+ */
+export async function updateLgpdRequest(
+  id: string,
+  updates: {
+    status?: "pending" | "processing" | "completed" | "rejected";
+    completedAt?: Date;
+    completedBy?: string;
+    notes?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db
+    .update(lgpdRequests)
+    .set(updates)
+    .where(eq(lgpdRequests.id, id));
 }
 

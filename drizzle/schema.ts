@@ -128,3 +128,59 @@ export const aiAgents = mysqlTable("ai_agents", {
 export type AiAgent = typeof aiAgents.$inferSelect;
 export type InsertAiAgent = typeof aiAgents.$inferInsert;
 
+
+
+/**
+ * User consents for LGPD compliance
+ */
+export const consents = mysqlTable("consents", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  type: mysqlEnum("type", ["terms", "privacy", "marketing"]).notNull(),
+  accepted: boolean("accepted").default(false).notNull(),
+  acceptedAt: timestamp("acceptedAt"),
+  revokedAt: timestamp("revokedAt"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  version: varchar("version", { length: 20 }).default("1.0"), // version of terms/privacy
+});
+
+export type Consent = typeof consents.$inferSelect;
+export type InsertConsent = typeof consents.$inferInsert;
+
+/**
+ * Audit logs for security and LGPD compliance
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  action: varchar("action", { length: 100 }).notNull(), // "view", "create", "edit", "delete", "export", "login", "logout"
+  resource: varchar("resource", { length: 100 }).notNull(), // "contact", "message", "pipeline", "user"
+  resourceId: varchar("resourceId", { length: 64 }),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  details: text("details"), // JSON with additional info
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * LGPD data requests (deletion, portability, correction)
+ */
+export const lgpdRequests = mysqlTable("lgpd_requests", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  type: mysqlEnum("type", ["deletion", "portability", "correction"]).notNull(),
+  status: mysqlEnum("status", ["pending", "processing", "completed", "rejected"]).default("pending").notNull(),
+  reason: text("reason"), // user's reason for request
+  requestedAt: timestamp("requestedAt").defaultNow(),
+  completedAt: timestamp("completedAt"),
+  completedBy: varchar("completedBy", { length: 64 }), // admin user id
+  notes: text("notes"), // admin notes
+});
+
+export type LgpdRequest = typeof lgpdRequests.$inferSelect;
+export type InsertLgpdRequest = typeof lgpdRequests.$inferInsert;
+
