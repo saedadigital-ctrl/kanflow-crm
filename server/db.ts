@@ -20,7 +20,19 @@ import {
   auditLogs,
   InsertAuditLog,
   lgpdRequests,
-  InsertLgpdRequest
+  InsertLgpdRequest,
+  organizations,
+  InsertOrganization,
+  organizationMembers,
+  InsertOrganizationMember,
+  subscriptionPlans,
+  InsertSubscriptionPlan,
+  subscriptions,
+  InsertSubscription,
+  payments,
+  InsertPayment,
+  usageLogs,
+  InsertUsageLog
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -485,5 +497,198 @@ export async function updateLgpdRequest(
     .update(lgpdRequests)
     .set(updates)
     .where(eq(lgpdRequests.id, id));
+}
+
+
+
+
+// ==================== ORGANIZATIONS ====================
+
+export async function createOrganization(org: InsertOrganization) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(organizations).values(org);
+  return org;
+}
+
+export async function getOrganization(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllOrganizations() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(organizations).orderBy(desc(organizations.createdAt));
+}
+
+export async function updateOrganization(id: string, data: Partial<InsertOrganization>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(organizations).set(data).where(eq(organizations.id, id));
+}
+
+export async function suspendOrganization(id: string) {
+  await updateOrganization(id, { status: "suspended" });
+}
+
+export async function activateOrganization(id: string) {
+  await updateOrganization(id, { status: "active" });
+}
+
+export async function cancelOrganization(id: string) {
+  await updateOrganization(id, { status: "cancelled" });
+}
+
+// ==================== ORGANIZATION MEMBERS ====================
+
+export async function addOrganizationMember(member: InsertOrganizationMember) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(organizationMembers).values(member);
+}
+
+export async function getOrganizationMembers(organizationId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(organizationMembers).where(eq(organizationMembers.organizationId, organizationId));
+}
+
+export async function removeOrganizationMember(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(organizationMembers).where(eq(organizationMembers.id, id));
+}
+
+// ==================== SUBSCRIPTION PLANS ====================
+
+export async function createSubscriptionPlan(plan: InsertSubscriptionPlan) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(subscriptionPlans).values(plan);
+  return plan;
+}
+
+export async function getAllSubscriptionPlans() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, true));
+}
+
+export async function getSubscriptionPlan(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateSubscriptionPlan(id: string, data: Partial<InsertSubscriptionPlan>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(subscriptionPlans).set(data).where(eq(subscriptionPlans.id, id));
+}
+
+// ==================== SUBSCRIPTIONS ====================
+
+export async function createSubscription(sub: InsertSubscription) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(subscriptions).values(sub);
+  return sub;
+}
+
+export async function getOrganizationSubscription(organizationId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(subscriptions)
+    .where(and(
+      eq(subscriptions.organizationId, organizationId),
+      eq(subscriptions.status, "active")
+    ))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateSubscription(id: string, data: Partial<InsertSubscription>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(subscriptions).set(data).where(eq(subscriptions.id, id));
+}
+
+export async function cancelSubscription(id: string) {
+  await updateSubscription(id, { 
+    status: "cancelled",
+    cancelledAt: new Date()
+  });
+}
+
+// ==================== PAYMENTS ====================
+
+export async function createPayment(payment: InsertPayment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(payments).values(payment);
+  return payment;
+}
+
+export async function getOrganizationPayments(organizationId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(payments)
+    .where(eq(payments.organizationId, organizationId))
+    .orderBy(desc(payments.createdAt));
+}
+
+export async function updatePayment(id: string, data: Partial<InsertPayment>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(payments).set(data).where(eq(payments.id, id));
+}
+
+// ==================== USAGE LOGS ====================
+
+export async function logUsage(log: InsertUsageLog) {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.insert(usageLogs).values(log);
+}
+
+export async function getOrganizationUsage(organizationId: string, metric?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  if (metric) {
+    return await db.select().from(usageLogs)
+      .where(and(
+        eq(usageLogs.organizationId, organizationId),
+        eq(usageLogs.metric, metric)
+      ))
+      .orderBy(desc(usageLogs.date));
+  }
+  
+  return await db.select().from(usageLogs)
+    .where(eq(usageLogs.organizationId, organizationId))
+    .orderBy(desc(usageLogs.date));
 }
 

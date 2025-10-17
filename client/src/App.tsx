@@ -21,6 +21,8 @@ import AIAgents from "./pages/AIAgents";
 import Settings from "./pages/Settings";
 import Messages from "./pages/Messages";
 import Pipeline from "./pages/Pipeline";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import Organizations from "./pages/admin/Organizations";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -110,6 +112,14 @@ function Router() {
         </Route>
         <Route path="/pipeline">
           <ProtectedRoute component={Pipeline} />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin">
+          <ProtectedRoute component={AdminDashboard} />
+        </Route>
+        <Route path="/admin/organizations">
+          <ProtectedRoute component={Organizations} />
         </Route>
 
         {/* Fallback */}

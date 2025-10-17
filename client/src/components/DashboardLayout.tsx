@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, MessageSquare, Zap, Bot, Settings, TrendingUp } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, MessageSquare, Zap, Bot, Settings, TrendingUp, Shield } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -29,6 +29,17 @@ import { Button } from "./ui/button";
 import Footer from "./Footer";
 
 const menuItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: TrendingUp, label: "Pipeline", path: "/pipeline" },
+  { icon: Users, label: "Contatos", path: "/contacts" },
+  { icon: MessageSquare, label: "Mensagens", path: "/messages" },
+  { icon: Zap, label: "Automações", path: "/automations" },
+  { icon: Bot, label: "Agentes IA", path: "/ai-agents" },
+  { icon: Settings, label: "Configurações", path: "/settings" },
+];
+
+const adminMenuItems = [
+  { icon: Shield, label: "Admin", path: "/admin" },
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: TrendingUp, label: "Pipeline", path: "/pipeline" },
   { icon: Users, label: "Contatos", path: "/contacts" },
@@ -215,7 +226,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {(user?.role === 'admin' ? adminMenuItems : menuItems).map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>

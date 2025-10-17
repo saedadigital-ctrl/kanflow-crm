@@ -184,3 +184,119 @@ export const lgpdRequests = mysqlTable("lgpd_requests", {
 export type LgpdRequest = typeof lgpdRequests.$inferSelect;
 export type InsertLgpdRequest = typeof lgpdRequests.$inferInsert;
 
+
+
+/**
+ * Organizations (Clientes/Empresas que compram o KanFlow)
+ * Multi-tenant: cada organização é um cliente que paga pela plataforma
+ */
+export const organizations = mysqlTable("organizations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(), // URL-friendly name
+  ownerId: varchar("ownerId", { length: 64 }).notNull(), // usuário dono da org
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  cnpj: varchar("cnpj", { length: 18 }),
+  address: text("address"),
+  status: mysqlEnum("status", ["active", "suspended", "cancelled"]).default("active").notNull(),
+  maxUsers: int("maxUsers").default(5).notNull(), // limite de usuários permitidos
+  currentUsers: int("currentUsers").default(1).notNull(), // usuários ativos atualmente
+  maxContacts: int("maxContacts").default(1000).notNull(), // limite de contatos
+  maxWhatsappNumbers: int("maxWhatsappNumbers").default(1).notNull(), // limite de números WhatsApp
+  trialEndsAt: timestamp("trialEndsAt"), // fim do período de teste
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = typeof organizations.$inferInsert;
+
+/**
+ * Organization Members - relaciona usuários com organizações
+ */
+export const organizationMembers = mysqlTable("organization_members", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  role: mysqlEnum("role", ["owner", "admin", "member"]).default("member").notNull(),
+  joinedAt: timestamp("joinedAt").defaultNow(),
+});
+
+export type OrganizationMember = typeof organizationMembers.$inferSelect;
+export type InsertOrganizationMember = typeof organizationMembers.$inferInsert;
+
+/**
+ * Subscription Plans - Planos de assinatura disponíveis
+ */
+export const subscriptionPlans = mysqlTable("subscription_plans", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // Ex: "Starter", "Pro", "Enterprise"
+  description: text("description"),
+  price: int("price").notNull(), // preço em centavos (R$ 99,00 = 9900)
+  billingCycle: mysqlEnum("billingCycle", ["monthly", "quarterly", "yearly"]).default("monthly").notNull(),
+  maxUsers: int("maxUsers").notNull(),
+  maxContacts: int("maxContacts").notNull(),
+  maxWhatsappNumbers: int("maxWhatsappNumbers").notNull(),
+  features: text("features"), // JSON array de features incluídas
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+
+/**
+ * Subscriptions - Assinaturas ativas das organizações
+ */
+export const subscriptions = mysqlTable("subscriptions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  planId: varchar("planId", { length: 64 }).notNull(),
+  status: mysqlEnum("status", ["active", "past_due", "cancelled", "expired"]).default("active").notNull(),
+  currentPeriodStart: timestamp("currentPeriodStart").notNull(),
+  currentPeriodEnd: timestamp("currentPeriodEnd").notNull(),
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false).notNull(),
+  cancelledAt: timestamp("cancelledAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+/**
+ * Payments - Histórico de pagamentos
+ */
+export const payments = mysqlTable("payments", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  subscriptionId: varchar("subscriptionId", { length: 64 }).notNull(),
+  amount: int("amount").notNull(), // em centavos
+  status: mysqlEnum("status", ["pending", "paid", "failed", "refunded"]).default("pending").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 50 }), // "credit_card", "pix", "boleto"
+  transactionId: varchar("transactionId", { length: 255 }), // ID externo do gateway
+  paidAt: timestamp("paidAt"),
+  dueDate: timestamp("dueDate"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Usage Logs - Logs de uso para billing/analytics
+ */
+export const usageLogs = mysqlTable("usage_logs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  metric: varchar("metric", { length: 100 }).notNull(), // "users", "contacts", "messages", "whatsapp_numbers"
+  value: int("value").notNull(),
+  date: timestamp("date").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type UsageLog = typeof usageLogs.$inferSelect;
+export type InsertUsageLog = typeof usageLogs.$inferInsert;
+

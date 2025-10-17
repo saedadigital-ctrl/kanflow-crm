@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { securityRouter } from "./routers/security";
+import { adminRouter } from "./routers/admin";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
@@ -10,6 +11,7 @@ import { nanoid } from "nanoid";
 export const appRouter = router({
   system: systemRouter,
   security: securityRouter,
+  admin: adminRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
