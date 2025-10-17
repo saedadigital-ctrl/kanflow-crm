@@ -118,6 +118,17 @@ export default function Login() {
                   Política de Privacidade
                 </Link>
               </p>
+              <p className="text-xs text-muted-foreground pt-2">
+                Desenvolvido por{" "}
+                <a
+                  href="https://aedadigital.com.br"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Studio AEDA Digital
+                </a>
+              </p>
             </div>
           </CardContent>
         </Card>
