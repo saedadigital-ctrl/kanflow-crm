@@ -1,11 +1,25 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, 
+  users,
+  contacts,
+  InsertContact,
+  pipelineStages,
+  InsertPipelineStage,
+  messages,
+  InsertMessage,
+  automations,
+  InsertAutomation,
+  aiAgents,
+  InsertAiAgent,
+  whatsappIntegrations,
+  InsertWhatsappIntegration
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -85,4 +99,230 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Pipeline Stages
+export async function getPipelineStages(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(pipelineStages)
+    .where(eq(pipelineStages.userId, userId))
+    .orderBy(pipelineStages.order);
+}
+
+export async function createPipelineStage(stage: InsertPipelineStage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(pipelineStages).values(stage);
+}
+
+export async function updatePipelineStage(id: string, updates: Partial<InsertPipelineStage>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(pipelineStages).set(updates).where(eq(pipelineStages.id, id));
+}
+
+export async function deletePipelineStage(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(pipelineStages).where(eq(pipelineStages.id, id));
+}
+
+// Contacts
+export async function getContacts(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(contacts)
+    .where(eq(contacts.userId, userId))
+    .orderBy(desc(contacts.updatedAt));
+}
+
+export async function getContactsByStage(userId: string, stageId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(contacts)
+    .where(and(eq(contacts.userId, userId), eq(contacts.stageId, stageId)))
+    .orderBy(desc(contacts.updatedAt));
+}
+
+export async function getContact(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(contacts).where(eq(contacts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createContact(contact: InsertContact) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(contacts).values(contact);
+}
+
+export async function updateContact(id: string, updates: Partial<InsertContact>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(contacts).set(updates).where(eq(contacts.id, id));
+}
+
+export async function deleteContact(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(contacts).where(eq(contacts.id, id));
+}
+
+// Messages
+export async function getMessagesByContact(contactId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(messages)
+    .where(eq(messages.contactId, contactId))
+    .orderBy(messages.createdAt);
+}
+
+export async function createMessage(message: InsertMessage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(messages).values(message);
+}
+
+// Automations
+export async function getAutomations(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(automations)
+    .where(eq(automations.userId, userId))
+    .orderBy(desc(automations.createdAt));
+}
+
+export async function getAutomation(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(automations).where(eq(automations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAutomation(automation: InsertAutomation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(automations).values(automation);
+}
+
+export async function updateAutomation(id: string, updates: Partial<InsertAutomation>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(automations).set(updates).where(eq(automations.id, id));
+}
+
+export async function deleteAutomation(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(automations).where(eq(automations.id, id));
+}
+
+// AI Agents
+export async function getAiAgents(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(aiAgents)
+    .where(eq(aiAgents.userId, userId))
+    .orderBy(desc(aiAgents.createdAt));
+}
+
+export async function getAiAgent(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(aiAgents).where(eq(aiAgents.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createAiAgent(agent: InsertAiAgent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(aiAgents).values(agent);
+}
+
+export async function updateAiAgent(id: string, updates: Partial<InsertAiAgent>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(aiAgents).set(updates).where(eq(aiAgents.id, id));
+}
+
+export async function deleteAiAgent(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(aiAgents).where(eq(aiAgents.id, id));
+}
+
+// WhatsApp Integrations
+export async function getWhatsappIntegrations(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(whatsappIntegrations)
+    .where(eq(whatsappIntegrations.userId, userId))
+    .orderBy(desc(whatsappIntegrations.createdAt));
+}
+
+export async function getWhatsappIntegration(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappIntegrations).where(eq(whatsappIntegrations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createWhatsappIntegration(integration: InsertWhatsappIntegration) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappIntegrations).values(integration);
+}
+
+export async function updateWhatsappIntegration(id: string, updates: Partial<InsertWhatsappIntegration>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappIntegrations).set(updates).where(eq(whatsappIntegrations.id, id));
+}
+
+export async function deleteWhatsappIntegration(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(whatsappIntegrations).where(eq(whatsappIntegrations.id, id));
+}
+
