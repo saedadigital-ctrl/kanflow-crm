@@ -29,6 +29,7 @@ import WhatsappIntegration from "./pages/WhatsappIntegration";
 import WhatsAppSetup from "./pages/WhatsAppSetup";
 import ConversationManager from "./pages/ConversationManager";
 import MyLicense from "./pages/MyLicense";
+import LandingPage from "./pages/LandingPage";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -118,6 +119,7 @@ function Router() {
 
       <Switch>
         {/* Public Routes */}
+        <Route path="/home" component={LandingPage} />
         <Route path="/login" component={Login} />
         <Route path="/privacy" component={Privacy} />
         <Route path="/terms" component={Terms} />
