@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, MessageCircle, TrendingUp, Users, Zap, BarChart3, Bot, Shield, ArrowRight, Star } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { SEO } from "@/components/SEO";
 
 export default function LandingPage() {
   const [, setLocation] = useLocation();
@@ -15,7 +16,9 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <>
+      <SEO />
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Header/Navbar */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 py-4">
@@ -54,14 +57,13 @@ export default function LandingPage() {
               🚀 Transforme WhatsApp em Vendas
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-              CRM Profissional para{" "}
+              CRM Profissional para WhatsApp com{" "}
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                WhatsApp
+                Automação e IA
               </span>
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed">
-              Gerencie conversas, automatize respostas e aumente suas vendas com o poder da IA.
-              Tudo em um só lugar, de forma simples e intuitiva.
+              Gerencie todas as suas conversas do WhatsApp Business em um Kanban visual. Automatize respostas com IA, organize leads no pipeline de vendas e aumente sua taxa de conversão. Sistema completo de CRM para equipes de vendas e atendimento.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
@@ -154,9 +156,9 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <Badge className="bg-blue-100 text-blue-700 mb-4">Recursos Poderosos</Badge>
-          <h2 className="text-4xl font-bold mb-4">Tudo que você precisa para vender mais</h2>
+          <div className="text-center mb-16">
+            <Badge className="bg-blue-100 text-blue-700 mb-4">Recursos Poderosos</Badge>
+            <h2 className="text-4xl font-bold mb-4">Funcionalidades Completas de CRM para WhatsApp Business</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Ferramentas profissionais que transformam seu WhatsApp em uma máquina de vendas
           </p>
@@ -166,32 +168,32 @@ export default function LandingPage() {
           {[
             {
               icon: MessageCircle,
-              title: "Kanban de Conversas",
-              description: "Organize todas as conversas em um board visual. Arraste e solte entre etapas.",
+              title: "Kanban de Conversas WhatsApp",
+              description: "Organize todas as conversas do WhatsApp Business em um board visual estilo Kanban. Arraste e solte leads entre etapas do funil de vendas.",
               color: "blue",
             },
             {
               icon: Bot,
-              title: "Agentes de IA",
-              description: "Respostas automáticas inteligentes que qualificam leads 24/7.",
+              title: "Chatbot com IA para WhatsApp",
+              description: "Respostas automáticas inteligentes com IA que qualificam leads, respondem dúvidas e agendam reuniões 24 horas por dia, 7 dias por semana.",
               color: "purple",
             },
             {
               icon: TrendingUp,
-              title: "Pipeline de Vendas",
-              description: "Acompanhe leads do primeiro contato até o fechamento.",
+              title: "Funil de Vendas Completo",
+              description: "Acompanhe cada lead desde o primeiro contato no WhatsApp até o fechamento da venda. Visualize taxas de conversão em cada etapa.",
               color: "green",
             },
             {
               icon: BarChart3,
-              title: "Dashboards e Relatórios",
-              description: "Métricas em tempo real para tomar decisões baseadas em dados.",
+              title: "Relatórios e Analytics Avançados",
+              description: "Dashboards com métricas em tempo real: taxa de conversão, tempo de resposta, volume de mensagens e performance da equipe de vendas.",
               color: "orange",
             },
             {
               icon: Users,
-              title: "Multi-Usuários",
-              description: "Toda sua equipe trabalhando junto, com permissões personalizadas.",
+              title: "Gestão de Equipe Multi-Usuário",
+              description: "Toda sua equipe de vendas e atendimento trabalhando no mesmo sistema, com permissões personalizadas e distribuição automática de leads.",
               color: "cyan",
             },
             {
@@ -423,6 +425,7 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
 

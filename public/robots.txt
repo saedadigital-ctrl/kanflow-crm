@@ -1,0 +1,24 @@
+# robots.txt para KanFlow CRM
+
+User-agent: *
+Allow: /
+Allow: /home
+Allow: /login
+Allow: /privacy
+Allow: /terms
+
+# Bloquear áreas privadas
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+Disallow: /contacts
+Disallow: /conversations
+Disallow: /pipeline
+Disallow: /settings
+
+# Sitemap
+Sitemap: https://kanflow.com.br/sitemap.xml
+
+# Crawl-delay (opcional)
+Crawl-delay: 10
+
