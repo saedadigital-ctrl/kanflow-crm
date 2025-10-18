@@ -23,6 +23,10 @@ import Messages from "./pages/Messages";
 import Pipeline from "./pages/Pipeline";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Organizations from "./pages/admin/Organizations";
+import WhatsappIntegration from "./pages/WhatsappIntegration";
+import WhatsAppSetup from "./pages/WhatsAppSetup";
+import ConversationManager from "./pages/ConversationManager";
+import MyLicense from "./pages/MyLicense";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -44,6 +48,35 @@ function ProtectedRoute({ component: Component, ...rest }: any) {
   }
 
   if (!isAuthenticated) {
+    return null;
+  }
+
+  return <Component {...rest} />;
+}
+
+// Admin Only Route Component
+function AdminRoute({ component: Component, ...rest }: any) {
+  const { isAuthenticated, loading, user } = useAuth();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      setLocation("/login");
+    }
+    if (!loading && isAuthenticated && user?.role !== "admin") {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, loading, user, setLocation]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || user?.role !== "admin") {
     return null;
   }
 
@@ -113,13 +146,25 @@ function Router() {
         <Route path="/pipeline">
           <ProtectedRoute component={Pipeline} />
         </Route>
+        <Route path="/whatsapp">
+          <ProtectedRoute component={WhatsappIntegration} />
+        </Route>
+        <Route path="/whatsapp-setup">
+          <ProtectedRoute component={WhatsAppSetup} />
+        </Route>
+        <Route path="/conversations">
+          <ProtectedRoute component={ConversationManager} />
+        </Route>
+        <Route path="/my-license">
+          <ProtectedRoute component={MyLicense} />
+        </Route>
 
         {/* Admin Routes */}
         <Route path="/admin">
-          <ProtectedRoute component={AdminDashboard} />
+          <AdminRoute component={AdminDashboard} />
         </Route>
         <Route path="/admin/organizations">
-          <ProtectedRoute component={Organizations} />
+          <AdminRoute component={Organizations} />
         </Route>
 
         {/* Fallback */}

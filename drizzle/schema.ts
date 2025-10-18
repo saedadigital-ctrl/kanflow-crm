@@ -300,3 +300,140 @@ export const usageLogs = mysqlTable("usage_logs", {
 export type UsageLog = typeof usageLogs.$inferSelect;
 export type InsertUsageLog = typeof usageLogs.$inferInsert;
 
+
+
+/**
+ * WhatsApp Accounts - Contas WhatsApp conectadas
+ * Cada organização pode ter múltiplas contas WhatsApp
+ */
+export const whatsappAccounts = mysqlTable("whatsapp_accounts", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  phoneNumber: varchar("phoneNumber", { length: 20 }).notNull().unique(), // Ex: +5511999999999
+  displayName: varchar("displayName", { length: 255 }), // Nome exibido nas conversas
+  accessToken: text("accessToken"), // Token de acesso da Meta API
+  businessAccountId: varchar("businessAccountId", { length: 255 }), // ID da conta de negócio
+  phoneNumberId: varchar("phoneNumberId", { length: 255 }), // ID do número de telefone
+  status: mysqlEnum("status", ["connected", "disconnected", "expired"]).default("disconnected").notNull(),
+  isDefault: boolean("isDefault").default(false).notNull(), // Número padrão para enviar mensagens
+  lastSyncedAt: timestamp("lastSyncedAt"),
+  expiresAt: timestamp("expiresAt"), // Data de expiração do token
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappAccount = typeof whatsappAccounts.$inferSelect;
+export type InsertWhatsappAccount = typeof whatsappAccounts.$inferInsert;
+
+/**
+ * WhatsApp Conversations - Conversas com clientes
+ * Rastreia todas as conversas por número WhatsApp
+ */
+export const whatsappConversations = mysqlTable("whatsapp_conversations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
+  contactId: varchar("contactId", { length: 64 }).notNull(), // Referência ao contato
+  waContactId: varchar("waContactId", { length: 255 }), // ID do contato no WhatsApp
+  status: mysqlEnum("status", ["active", "archived", "closed"]).default("active").notNull(),
+  lastMessageAt: timestamp("lastMessageAt"),
+  unreadCount: int("unreadCount").default(0).notNull(),
+  assignedTo: varchar("assignedTo", { length: 64 }), // Usuário responsável
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappConversation = typeof whatsappConversations.$inferSelect;
+export type InsertWhatsappConversation = typeof whatsappConversations.$inferInsert;
+
+/**
+ * WhatsApp Messages - Histórico de mensagens
+ * Todas as mensagens enviadas e recebidas
+ */
+export const whatsappMessages = mysqlTable("whatsapp_messages", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  conversationId: varchar("conversationId", { length: 64 }).notNull(),
+  whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
+  waMessageId: varchar("waMessageId", { length: 255 }).unique(), // ID único do WhatsApp
+  direction: mysqlEnum("direction", ["inbound", "outbound"]).notNull(), // Entrada ou saída
+  messageType: mysqlEnum("messageType", ["text", "image", "document", "audio", "video", "template"]).default("text").notNull(),
+  content: text("content"), // Conteúdo da mensagem
+  mediaUrl: text("mediaUrl"), // URL da mídia se aplicável
+  status: mysqlEnum("status", ["sent", "delivered", "read", "failed"]).default("sent").notNull(),
+  senderPhone: varchar("senderPhone", { length: 20 }), // Número do remetente
+  senderName: varchar("senderName", { length: 255 }), // Nome do remetente
+  isFromBot: boolean("isFromBot").default(false).notNull(), // Se foi enviada por bot/automação
+  automationId: varchar("automationId", { length: 64 }), // Referência à automação se aplicável
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappMessage = typeof whatsappMessages.$inferSelect;
+export type InsertWhatsappMessage = typeof whatsappMessages.$inferInsert;
+
+/**
+ * WhatsApp Templates - Templates de mensagens pré-aprovadas
+ * Meta exige templates pré-aprovados para mensagens de negócio
+ */
+export const whatsappTemplates = mysqlTable("whatsapp_templates", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(), // Nome do template
+  category: mysqlEnum("category", ["marketing", "authentication", "utility"]).default("utility").notNull(),
+  language: varchar("language", { length: 10 }).default("pt_BR").notNull(),
+  headerText: text("headerText"), // Cabeçalho do template
+  bodyText: text("bodyText").notNull(), // Corpo da mensagem
+  footerText: text("footerText"), // Rodapé
+  buttons: text("buttons"), // JSON array de botões
+  status: mysqlEnum("status", ["approved", "pending", "rejected"]).default("pending").notNull(),
+  waTemplateId: varchar("waTemplateId", { length: 255 }), // ID do template no WhatsApp
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappTemplate = typeof whatsappTemplates.$inferSelect;
+export type InsertWhatsappTemplate = typeof whatsappTemplates.$inferInsert;
+
+/**
+ * WhatsApp Webhooks - Configuração de webhooks da Meta
+ * Para receber mensagens em tempo real
+ */
+export const whatsappWebhooks = mysqlTable("whatsapp_webhooks", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
+  webhookUrl: text("webhookUrl").notNull(), // URL para receber webhooks
+  verifyToken: varchar("verifyToken", { length: 255 }).notNull(), // Token de verificação
+  isActive: boolean("isActive").default(true).notNull(),
+  lastReceivedAt: timestamp("lastReceivedAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappWebhook = typeof whatsappWebhooks.$inferSelect;
+export type InsertWhatsappWebhook = typeof whatsappWebhooks.$inferInsert;
+
+/**
+ * Licenses - Licenças ativas/suspensas/canceladas
+ * Controla acesso dos clientes à plataforma
+ */
+export const licenses = mysqlTable("licenses", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  licenseKey: varchar("licenseKey", { length: 255 }).notNull().unique(),
+  status: mysqlEnum("status", ["active", "suspended", "expired", "cancelled"]).default("active").notNull(),
+  startDate: timestamp("startDate").notNull(),
+  expiryDate: timestamp("expiryDate").notNull(),
+  renewalDate: timestamp("renewalDate"),
+  lastAccessDate: timestamp("lastAccessDate"),
+  accessCount: int("accessCount").default(0),
+  reason: text("reason"), // Motivo da suspensão/cancelamento
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type License = typeof licenses.$inferSelect;
+export type InsertLicense = typeof licenses.$inferInsert;
+

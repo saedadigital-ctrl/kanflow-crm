@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, MessageSquare, Zap, Bot, Settings, TrendingUp, Shield } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, MessageSquare, Zap, Bot, Settings, TrendingUp, Shield, MessageCircle, CreditCard } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,9 +32,11 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: TrendingUp, label: "Pipeline", path: "/pipeline" },
   { icon: Users, label: "Contatos", path: "/contacts" },
+  { icon: MessageCircle, label: "WhatsApp", path: "/whatsapp" },
   { icon: MessageSquare, label: "Mensagens", path: "/messages" },
   { icon: Zap, label: "Automações", path: "/automations" },
   { icon: Bot, label: "Agentes IA", path: "/ai-agents" },
+  { icon: CreditCard, label: "Minha Licença", path: "/my-license" },
   { icon: Settings, label: "Configurações", path: "/settings" },
 ];
 
@@ -43,6 +45,7 @@ const adminMenuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: TrendingUp, label: "Pipeline", path: "/pipeline" },
   { icon: Users, label: "Contatos", path: "/contacts" },
+  { icon: MessageCircle, label: "WhatsApp", path: "/whatsapp" },
   { icon: MessageSquare, label: "Mensagens", path: "/messages" },
   { icon: Zap, label: "Automações", path: "/automations" },
   { icon: Bot, label: "Agentes IA", path: "/ai-agents" },

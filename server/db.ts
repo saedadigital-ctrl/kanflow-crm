@@ -32,7 +32,19 @@ import {
   payments,
   InsertPayment,
   usageLogs,
-  InsertUsageLog
+  InsertUsageLog,
+  whatsappAccounts,
+  InsertWhatsappAccount,
+  whatsappConversations,
+  InsertWhatsappConversation,
+  whatsappMessages,
+  InsertWhatsappMessage,
+  whatsappTemplates,
+  InsertWhatsappTemplate,
+  whatsappWebhooks,
+  InsertWhatsappWebhook,
+  licenses,
+  InsertLicense
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -520,31 +532,7 @@ export async function getOrganization(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-export async function getAllOrganizations() {
-  const db = await getDb();
-  if (!db) return [];
-  
-  return await db.select().from(organizations).orderBy(desc(organizations.createdAt));
-}
-
-export async function updateOrganization(id: string, data: Partial<InsertOrganization>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(organizations).set(data).where(eq(organizations.id, id));
-}
-
-export async function suspendOrganization(id: string) {
-  await updateOrganization(id, { status: "suspended" });
-}
-
-export async function activateOrganization(id: string) {
-  await updateOrganization(id, { status: "active" });
-}
-
-export async function cancelOrganization(id: string) {
-  await updateOrganization(id, { status: "cancelled" });
-}
+// Removed old duplicate functions - using new versions with better functionality below
 
 // ==================== ORGANIZATION MEMBERS ====================
 
@@ -690,5 +678,453 @@ export async function getOrganizationUsage(organizationId: string, metric?: stri
   return await db.select().from(usageLogs)
     .where(eq(usageLogs.organizationId, organizationId))
     .orderBy(desc(usageLogs.date));
+}
+
+
+
+
+// ==================== WHATSAPP ACCOUNTS ====================
+
+export async function createWhatsappAccount(account: InsertWhatsappAccount) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappAccounts).values(account);
+  return account;
+}
+
+export async function getWhatsappAccount(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappAccounts).where(eq(whatsappAccounts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getOrganizationWhatsappAccounts(organizationId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(whatsappAccounts)
+    .where(eq(whatsappAccounts.organizationId, organizationId))
+    .orderBy(desc(whatsappAccounts.createdAt));
+}
+
+export async function getDefaultWhatsappAccount(organizationId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappAccounts)
+    .where(and(
+      eq(whatsappAccounts.organizationId, organizationId),
+      eq(whatsappAccounts.isDefault, true),
+      eq(whatsappAccounts.status, "connected")
+    ))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateWhatsappAccount(id: string, data: Partial<InsertWhatsappAccount>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappAccounts).set(data).where(eq(whatsappAccounts.id, id));
+}
+
+export async function deleteWhatsappAccount(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(whatsappAccounts).where(eq(whatsappAccounts.id, id));
+}
+
+// ==================== WHATSAPP CONVERSATIONS ====================
+
+export async function createWhatsappConversation(conversation: InsertWhatsappConversation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappConversations).values(conversation);
+  return conversation;
+}
+
+export async function getWhatsappConversation(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappConversations)
+    .where(eq(whatsappConversations.id, id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getOrganizationConversations(organizationId: string, status?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  if (status) {
+    return await db.select().from(whatsappConversations)
+      .where(and(
+        eq(whatsappConversations.organizationId, organizationId),
+        eq(whatsappConversations.status, status as any)
+      ))
+      .orderBy(desc(whatsappConversations.lastMessageAt));
+  }
+  
+  return await db.select().from(whatsappConversations)
+    .where(eq(whatsappConversations.organizationId, organizationId))
+    .orderBy(desc(whatsappConversations.lastMessageAt));
+}
+
+export async function updateWhatsappConversation(id: string, data: Partial<InsertWhatsappConversation>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappConversations).set(data).where(eq(whatsappConversations.id, id));
+}
+
+// ==================== WHATSAPP MESSAGES ====================
+
+export async function createWhatsappMessage(message: InsertWhatsappMessage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappMessages).values(message);
+  return message;
+}
+
+export async function getConversationMessages(conversationId: string, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(whatsappMessages)
+    .where(eq(whatsappMessages.conversationId, conversationId))
+    .orderBy(desc(whatsappMessages.createdAt))
+    .limit(limit);
+}
+
+export async function updateWhatsappMessage(id: string, data: Partial<InsertWhatsappMessage>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappMessages).set(data).where(eq(whatsappMessages.id, id));
+}
+
+// ==================== WHATSAPP TEMPLATES ====================
+
+export async function createWhatsappTemplate(template: InsertWhatsappTemplate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappTemplates).values(template);
+  return template;
+}
+
+export async function getOrganizationTemplates(organizationId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(whatsappTemplates)
+    .where(eq(whatsappTemplates.organizationId, organizationId))
+    .orderBy(desc(whatsappTemplates.createdAt));
+}
+
+export async function getApprovedTemplates(organizationId: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(whatsappTemplates)
+    .where(and(
+      eq(whatsappTemplates.organizationId, organizationId),
+      eq(whatsappTemplates.status, "approved")
+    ));
+}
+
+export async function updateWhatsappTemplate(id: string, data: Partial<InsertWhatsappTemplate>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappTemplates).set(data).where(eq(whatsappTemplates.id, id));
+}
+
+// ==================== WHATSAPP WEBHOOKS ====================
+
+export async function createWhatsappWebhook(webhook: InsertWhatsappWebhook) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(whatsappWebhooks).values(webhook);
+  return webhook;
+}
+
+export async function getWhatsappWebhook(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappWebhooks)
+    .where(eq(whatsappWebhooks.id, id))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAccountWebhook(whatsappAccountId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(whatsappWebhooks)
+    .where(eq(whatsappWebhooks.whatsappAccountId, whatsappAccountId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateWhatsappWebhook(id: string, data: Partial<InsertWhatsappWebhook>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(whatsappWebhooks).set(data).where(eq(whatsappWebhooks.id, id));
+}
+
+
+
+// ==================== LICENSES ====================
+
+export async function createLicense(license: InsertLicense) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(licenses).values(license);
+  return license;
+}
+
+export async function getLicense(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(licenses).where(eq(licenses.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getOrganizationLicense(organizationId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(licenses)
+    .where(eq(licenses.organizationId, organizationId))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateLicense(id: string, data: Partial<InsertLicense>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(licenses).set(data).where(eq(licenses.id, id));
+}
+
+export async function suspendLicense(id: string, reason: string) {
+  await updateLicense(id, {
+    status: "suspended",
+    reason: reason
+  });
+}
+
+export async function activateLicense(id: string) {
+  await updateLicense(id, {
+    status: "active",
+    reason: undefined
+  });
+}
+
+export async function cancelLicense(id: string, reason: string) {
+  await updateLicense(id, {
+    status: "cancelled",
+    reason: reason
+  });
+}
+
+export async function expireLicense(id: string) {
+  await updateLicense(id, {
+    status: "expired"
+  });
+}
+
+// ==================== ADMIN FUNCTIONS ====================
+
+/**
+ * Get all organizations (for admin dashboard)
+ */
+export async function getAllOrganizations(options?: {
+  status?: "active" | "suspended" | "cancelled";
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query = db.select().from(organizations);
+  
+  if (options?.status) {
+    query = query.where(eq(organizations.status, options.status)) as any;
+  }
+  
+  return await query
+    .orderBy(desc(organizations.createdAt))
+    .limit(options?.limit || 50)
+    .offset(options?.offset || 0);
+}
+
+/**
+ * Get organization with license info
+ */
+export async function getOrganizationWithLicense(organizationId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const org = await db.select().from(organizations)
+    .where(eq(organizations.id, organizationId))
+    .limit(1);
+  
+  if (org.length === 0) return undefined;
+  
+  const license = await getOrganizationLicense(organizationId);
+  const subscription = await getOrganizationSubscription(organizationId);
+  const payments = await getOrganizationPayments(organizationId);
+  
+  return {
+    ...org[0],
+    license,
+    subscription,
+    recentPayments: payments.slice(0, 5)
+  };
+}
+
+/**
+ * Get admin dashboard stats
+ */
+export async function getAdminDashboardStats() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const allOrgs = await db.select().from(organizations);
+  const activeOrgs = await db.select().from(organizations)
+    .where(eq(organizations.status, "active"));
+  const suspendedOrgs = await db.select().from(organizations)
+    .where(eq(organizations.status, "suspended"));
+  const cancelledOrgs = await db.select().from(organizations)
+    .where(eq(organizations.status, "cancelled"));
+  
+  // Calculate total revenue
+  const allPayments = await db.select().from(payments)
+    .where(eq(payments.status, "paid"));
+  
+  const totalRevenue = allPayments.reduce((sum, p) => sum + p.amount, 0);
+  
+  return {
+    totalOrganizations: allOrgs.length,
+    activeOrganizations: activeOrgs.length,
+    suspendedOrganizations: suspendedOrgs.length,
+    cancelledOrganizations: cancelledOrgs.length,
+    totalRevenue: totalRevenue,
+    totalUsers: allOrgs.reduce((sum, org) => sum + org.currentUsers, 0),
+    totalContacts: allOrgs.reduce((sum, org) => sum + org.currentContacts, 0),
+  };
+}
+
+/**
+ * Suspend organization
+ */
+export async function suspendOrganization(organizationId: string, reason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Update organization status
+  await db.update(organizations)
+    .set({ status: "suspended" })
+    .where(eq(organizations.id, organizationId));
+  
+  // Suspend license
+  const license = await getOrganizationLicense(organizationId);
+  if (license) {
+    await suspendLicense(license.id, reason);
+  }
+  
+  // Log action
+  await createAuditLog({
+    id: `audit_${Date.now()}`,
+    userId: "system",
+    action: "organization_suspended",
+    resource: "organization",
+    resourceId: organizationId,
+    details: JSON.stringify({ reason })
+  });
+}
+
+/**
+ * Activate organization
+ */
+export async function activateOrganization(organizationId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Update organization status
+  await db.update(organizations)
+    .set({ status: "active" })
+    .where(eq(organizations.id, organizationId));
+  
+  // Activate license
+  const license = await getOrganizationLicense(organizationId);
+  if (license) {
+    await activateLicense(license.id);
+  }
+  
+  // Log action
+  await createAuditLog({
+    id: `audit_${Date.now()}`,
+    userId: "system",
+    action: "organization_activated",
+    resource: "organization",
+    resourceId: organizationId,
+    details: JSON.stringify({})
+  });
+}
+
+/**
+ * Cancel organization
+ */
+export async function cancelOrganization(organizationId: string, reason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Update organization status
+  await db.update(organizations)
+    .set({ status: "cancelled" })
+    .where(eq(organizations.id, organizationId));
+  
+  // Cancel license
+  const license = await getOrganizationLicense(organizationId);
+  if (license) {
+    await cancelLicense(license.id, reason);
+  }
+  
+  // Cancel subscription
+  const subscription = await getOrganizationSubscription(organizationId);
+  if (subscription) {
+    await cancelSubscription(subscription.id);
+  }
+  
+  // Log action
+  await createAuditLog({
+    id: `audit_${Date.now()}`,
+    userId: "system",
+    action: "organization_cancelled",
+    resource: "organization",
+    resourceId: organizationId,
+    details: JSON.stringify({ reason })
+  });
 }
 

@@ -3,6 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { securityRouter } from "./routers/security";
 import { adminRouter } from "./routers/admin";
+import { clientRouter } from "./routers/clientRouter";
+import { whatsappRouter } from "./routers/whatsapp";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
@@ -12,6 +14,8 @@ export const appRouter = router({
   system: systemRouter,
   security: securityRouter,
   admin: adminRouter,
+  client: clientRouter,
+  whatsapp: whatsappRouter,
 
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -274,59 +278,6 @@ export const appRouter = router({
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => {
         await db.deleteAiAgent(input.id);
-        return { success: true };
-      }),
-  }),
-
-  // WhatsApp Integrations
-  whatsapp: router({
-    list: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getWhatsappIntegrations(ctx.user.id);
-    }),
-
-    get: protectedProcedure
-      .input(z.object({ id: z.string() }))
-      .query(async ({ input }) => {
-        return await db.getWhatsappIntegration(input.id);
-      }),
-
-    create: protectedProcedure
-      .input(z.object({
-        phoneNumber: z.string(),
-        businessAccountId: z.string().optional(),
-        accessToken: z.string().optional(),
-        webhookVerifyToken: z.string().optional(),
-        isActive: z.boolean().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const id = nanoid();
-        await db.createWhatsappIntegration({
-          id,
-          userId: ctx.user.id,
-          ...input,
-        });
-        return { id };
-      }),
-
-    update: protectedProcedure
-      .input(z.object({
-        id: z.string(),
-        phoneNumber: z.string().optional(),
-        businessAccountId: z.string().optional(),
-        accessToken: z.string().optional(),
-        webhookVerifyToken: z.string().optional(),
-        isActive: z.boolean().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const { id, ...updates } = input;
-        await db.updateWhatsappIntegration(id, updates);
-        return { success: true };
-      }),
-
-    delete: protectedProcedure
-      .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => {
-        await db.deleteWhatsappIntegration(input.id);
         return { success: true };
       }),
   }),
