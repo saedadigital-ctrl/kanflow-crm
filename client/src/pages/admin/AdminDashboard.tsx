@@ -15,7 +15,7 @@ import { useLocation } from "wouter";
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
-  const { data: stats, isLoading } = trpc.admin.getDashboardStats.useQuery();
+  const { data: stats, isLoading } = trpc.admin.stats.useQuery();
 
   if (isLoading) {
     return (

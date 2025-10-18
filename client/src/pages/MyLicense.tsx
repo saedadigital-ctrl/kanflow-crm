@@ -18,11 +18,11 @@ export default function MyLicense() {
   // TODO: Get organizationId from user context
   const organizationId = "org_demo";
   
-  const { data: licenseData, isLoading: licenseLoading } = trpc.client.getLicense.useQuery({
+  const { data: licenseData, isLoading: licenseLoading } = trpc.app.getLicense.useQuery({
     organizationId,
   });
 
-  const { data: orgInfo, isLoading: orgLoading } = trpc.client.getOrganizationInfo.useQuery({
+  const { data: orgInfo, isLoading: orgLoading } = trpc.app.getOrganizationInfo.useQuery({
     organizationId,
   });
 

@@ -14,7 +14,7 @@ export const appRouter = router({
   system: systemRouter,
   security: securityRouter,
   admin: adminRouter,
-  client: clientRouter,
+  app: clientRouter,
   whatsapp: whatsappRouter,
 
   auth: router({

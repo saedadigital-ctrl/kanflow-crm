@@ -53,12 +53,12 @@ export default function Organizations() {
     reason: "",
   });
 
-  const { data: organizations, isLoading, refetch } = trpc.admin.listOrganizations.useQuery({
+  const { data: organizations, isLoading, refetch } = trpc.admin.organizations.list.useQuery({
     limit: 100,
     offset: 0,
   });
 
-  const suspendMutation = trpc.admin.suspendOrganization.useMutation({
+  const suspendMutation = trpc.admin.organizations.suspend.useMutation({
     onSuccess: () => {
       toast.success("Organização suspensa com sucesso!");
       refetch();
@@ -69,7 +69,7 @@ export default function Organizations() {
     },
   });
 
-  const activateMutation = trpc.admin.activateOrganization.useMutation({
+  const activateMutation = trpc.admin.organizations.activate.useMutation({
     onSuccess: () => {
       toast.success("Organização ativada com sucesso!");
       refetch();
@@ -80,7 +80,7 @@ export default function Organizations() {
     },
   });
 
-  const cancelMutation = trpc.admin.cancelOrganization.useMutation({
+  const cancelMutation = trpc.admin.organizations.cancel.useMutation({
     onSuccess: () => {
       toast.success("Organização cancelada com sucesso!");
       refetch();

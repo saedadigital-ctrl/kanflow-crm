@@ -76,9 +76,9 @@ export const adminRouter = router({
       }),
 
     suspend: adminProcedure
-      .input(z.object({ id: z.string() }))
+      .input(z.object({ id: z.string(), reason: z.string().optional() }))
       .mutation(async ({ input }) => {
-        await db.suspendOrganization(input.id);
+        await db.suspendOrganization(input.id, input.reason || 'Suspensão administrativa');
         return { success: true, message: 'Organização suspensa com sucesso' };
       }),
 
@@ -90,9 +90,9 @@ export const adminRouter = router({
       }),
 
     cancel: adminProcedure
-      .input(z.object({ id: z.string() }))
+      .input(z.object({ id: z.string(), reason: z.string().optional() }))
       .mutation(async ({ input }) => {
-        await db.cancelOrganization(input.id);
+        await db.cancelOrganization(input.id, input.reason || 'Cancelamento administrativo');
         return { success: true, message: 'Organização cancelada com sucesso' };
       }),
 

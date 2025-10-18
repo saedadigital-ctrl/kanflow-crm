@@ -437,3 +437,25 @@ export const licenses = mysqlTable("licenses", {
 export type License = typeof licenses.$inferSelect;
 export type InsertLicense = typeof licenses.$inferInsert;
 
+
+
+/**
+ * Audit Logs - Logs de auditoria para compliance LGPD e segurança
+ * Registra todas as ações importantes no sistema
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  eventType: varchar("eventType", { length: 100 }).notNull(), // Tipo de evento
+  severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).notNull(),
+  userId: varchar("userId", { length: 64 }), // Usuário que executou a ação
+  organizationId: varchar("organizationId", { length: 64 }), // Organização relacionada
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv4 ou IPv6
+  userAgent: text("userAgent"), // Browser/device info
+  metadata: text("metadata"), // JSON com dados adicionais
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+

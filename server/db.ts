@@ -532,6 +532,15 @@ export async function getOrganization(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function updateOrganization(id: string, data: Partial<InsertOrganization>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(organizations)
+    .set(data)
+    .where(eq(organizations.id, id));
+}
+
 // Removed old duplicate functions - using new versions with better functionality below
 
 // ==================== ORGANIZATION MEMBERS ====================
@@ -1031,7 +1040,6 @@ export async function getAdminDashboardStats() {
     cancelledOrganizations: cancelledOrgs.length,
     totalRevenue: totalRevenue,
     totalUsers: allOrgs.reduce((sum, org) => sum + org.currentUsers, 0),
-    totalContacts: allOrgs.reduce((sum, org) => sum + org.currentContacts, 0),
   };
 }
 
