@@ -23,6 +23,8 @@ import Messages from "./pages/Messages";
 import Pipeline from "./pages/Pipeline";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Organizations from "./pages/admin/Organizations";
+import ClientDetails from "./pages/admin/ClientDetails";
+import Billing from "./pages/admin/Billing";
 import WhatsappIntegration from "./pages/WhatsappIntegration";
 import WhatsAppSetup from "./pages/WhatsAppSetup";
 import ConversationManager from "./pages/ConversationManager";
@@ -165,6 +167,12 @@ function Router() {
         </Route>
         <Route path="/admin/organizations">
           <AdminRoute component={Organizations} />
+        </Route>
+        <Route path="/admin/clients/:id">
+          <AdminRoute component={ClientDetails} />
+        </Route>
+        <Route path="/admin/billing">
+          <AdminRoute component={Billing} />
         </Route>
 
         {/* Fallback */}
