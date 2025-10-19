@@ -74,7 +74,7 @@ export const corsOptions = {
     // Permitir requisições sem origin (mobile apps, Postman)
     if (!origin) return callback(null, true);
 
-    const isAllowed = allowedOrigins.some((allowed) => {
+    const isAllowed = allowedOrigins.filter((a): a is string | RegExp => a !== undefined).some((allowed) => {
       if (typeof allowed === "string") return allowed === origin;
       return allowed.test(origin);
     });

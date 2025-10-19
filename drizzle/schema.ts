@@ -148,23 +148,7 @@ export const consents = mysqlTable("consents", {
 export type Consent = typeof consents.$inferSelect;
 export type InsertConsent = typeof consents.$inferInsert;
 
-/**
- * Audit logs for security and LGPD compliance
- */
-export const auditLogs = mysqlTable("audit_logs", {
-  id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
-  action: varchar("action", { length: 100 }).notNull(), // "view", "create", "edit", "delete", "export", "login", "logout"
-  resource: varchar("resource", { length: 100 }).notNull(), // "contact", "message", "pipeline", "user"
-  resourceId: varchar("resourceId", { length: 64 }),
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  userAgent: text("userAgent"),
-  details: text("details"), // JSON with additional info
-  createdAt: timestamp("createdAt").defaultNow(),
-});
-
-export type AuditLog = typeof auditLogs.$inferSelect;
-export type InsertAuditLog = typeof auditLogs.$inferInsert;
+// Audit logs moved to line 446 (newer version with better schema)
 
 /**
  * LGPD data requests (deletion, portability, correction)

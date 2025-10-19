@@ -1064,11 +1064,12 @@ export async function suspendOrganization(organizationId: string, reason: string
   // Log action
   await createAuditLog({
     id: `audit_${Date.now()}`,
+    eventType: "organization_suspended",
+    severity: "warning",
     userId: "system",
-    action: "organization_suspended",
-    resource: "organization",
-    resourceId: organizationId,
-    details: JSON.stringify({ reason })
+    organizationId,
+    metadata: JSON.stringify({ reason }),
+    timestamp: new Date(),
   });
 }
 
@@ -1093,11 +1094,12 @@ export async function activateOrganization(organizationId: string) {
   // Log action
   await createAuditLog({
     id: `audit_${Date.now()}`,
+    eventType: "organization_activated",
+    severity: "info",
     userId: "system",
-    action: "organization_activated",
-    resource: "organization",
-    resourceId: organizationId,
-    details: JSON.stringify({})
+    organizationId,
+    metadata: null,
+    timestamp: new Date(),
   });
 }
 
@@ -1128,11 +1130,12 @@ export async function cancelOrganization(organizationId: string, reason: string)
   // Log action
   await createAuditLog({
     id: `audit_${Date.now()}`,
+    eventType: "organization_cancelled",
+    severity: "warning",
     userId: "system",
-    action: "organization_cancelled",
-    resource: "organization",
-    resourceId: organizationId,
-    details: JSON.stringify({ reason })
+    organizationId,
+    metadata: JSON.stringify({ reason }),
+    timestamp: new Date(),
   });
 }
 

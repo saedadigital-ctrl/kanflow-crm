@@ -112,13 +112,14 @@ export const clientRouter = router({
         // Log the action
         await createAuditLog({
           id: `audit_${Date.now()}_${Math.random()}`,
+          eventType: "whatsapp_connected",
+          severity: "info",
           userId: ctx.user?.id || "system",
-          action: "connect_whatsapp",
-          resource: "whatsapp_account",
-          resourceId: accountId,
-          ipAddress: ctx.req.ip,
-          userAgent: ctx.req.headers.get("user-agent") || undefined,
-          details: JSON.stringify({ phoneNumber: input.phoneNumber }),
+          organizationId: input.organizationId,
+          ipAddress: ctx.req.ip || null,
+          userAgent: (ctx.req.headers["user-agent"] as string | undefined) || null,
+          metadata: JSON.stringify({ phoneNumber: input.phoneNumber, accountId }),
+          timestamp: new Date(),
         });
 
         // Log usage
@@ -157,13 +158,14 @@ export const clientRouter = router({
       // Log the action
       await createAuditLog({
         id: `audit_${Date.now()}_${Math.random()}`,
+        eventType: "whatsapp_disconnected",
+        severity: "warning",
         userId: ctx.user?.id || "system",
-        action: "disconnect_whatsapp",
-        resource: "whatsapp_account",
-        resourceId: input.accountId,
-        ipAddress: ctx.req.ip,
-        userAgent: ctx.req.headers.get("user-agent") || undefined,
-        details: JSON.stringify({}),
+        organizationId: input.organizationId,
+        ipAddress: ctx.req.ip || null,
+        userAgent: (ctx.req.headers["user-agent"] as string | undefined) || null,
+        metadata: JSON.stringify({ accountId: input.accountId }),
+        timestamp: new Date(),
       });
 
       return { success: true };
@@ -252,13 +254,14 @@ export const clientRouter = router({
         // Log the action
         await createAuditLog({
           id: `audit_${Date.now()}_${Math.random()}`,
+          eventType: "message_sent",
+          severity: "info",
           userId: ctx.user?.id || "system",
-          action: "send_message",
-          resource: "message",
-          resourceId: messageId,
-          ipAddress: ctx.req.ip,
-          userAgent: ctx.req.headers.get("user-agent") || undefined,
-          details: JSON.stringify({ conversationId: input.conversationId }),
+          organizationId: input.organizationId,
+          ipAddress: ctx.req.ip || null,
+          userAgent: (ctx.req.headers["user-agent"] as string | undefined) || null,
+          metadata: JSON.stringify({ conversationId: input.conversationId, messageId }),
+          timestamp: new Date(),
         });
 
         return { success: true, messageId };
@@ -289,13 +292,14 @@ export const clientRouter = router({
       // Log the action
       await createAuditLog({
         id: `audit_${Date.now()}_${Math.random()}`,
+        eventType: "conversation_status_updated",
+        severity: "info",
         userId: ctx.user?.id || "system",
-        action: "update_conversation_status",
-        resource: "conversation",
-        resourceId: input.conversationId,
-        ipAddress: ctx.req.ip,
-        userAgent: ctx.req.headers.get("user-agent") || undefined,
-        details: JSON.stringify({ status: input.status }),
+        organizationId: input.organizationId,
+        ipAddress: ctx.req.ip || null,
+        userAgent: (ctx.req.headers["user-agent"] as string | undefined) || null,
+        metadata: JSON.stringify({ conversationId: input.conversationId, status: input.status }),
+        timestamp: new Date(),
       });
 
       return { success: true };

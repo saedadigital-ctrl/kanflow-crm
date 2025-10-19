@@ -81,13 +81,14 @@ export const securityRouter = router({
       // Log the action
       await createAuditLog({
         id: nanoid(),
+        eventType: "consent_accepted",
+        severity: "info",
         userId: ctx.user.id,
-        action: "accept_consents",
-        resource: "consent",
-        resourceId: ctx.user.id,
+        organizationId: null,
         ipAddress,
         userAgent,
-        details: JSON.stringify({ terms: input.terms, privacy: input.privacy, marketing: input.marketing }),
+        metadata: JSON.stringify({ terms: input.terms, privacy: input.privacy, marketing: input.marketing }),
+        timestamp: new Date(),
       });
 
       return { success: true };
@@ -132,13 +133,14 @@ export const securityRouter = router({
       // Log the action
       await createAuditLog({
         id: nanoid(),
+        eventType: "data_deletion_requested",
+        severity: "warning",
         userId: ctx.user.id,
-        action: "request_deletion",
-        resource: "user",
-        resourceId: ctx.user.id,
+        organizationId: null,
         ipAddress,
         userAgent,
-        details: JSON.stringify({ reason: input.reason }),
+        metadata: JSON.stringify({ reason: input.reason }),
+        timestamp: new Date(),
       });
 
       return { success: true, message: "Sua solicitação foi recebida e será processada em até 7 dias úteis." };
@@ -160,12 +162,14 @@ export const securityRouter = router({
     // Log the action
     await createAuditLog({
       id: nanoid(),
+      eventType: "data_export_requested",
+      severity: "info",
       userId: ctx.user.id,
-      action: "request_export",
-      resource: "user",
-      resourceId: ctx.user.id,
+      organizationId: null,
       ipAddress,
       userAgent,
+      metadata: null,
+      timestamp: new Date(),
     });
 
     return { success: true, message: "Seus dados serão exportados e enviados por email em breve." };

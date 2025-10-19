@@ -1,4 +1,4 @@
-import { db } from "../db";
+import { createAuditLog } from "../db";
 import { auditLogs } from "../../drizzle/schema";
 
 /**
@@ -81,13 +81,14 @@ export class AuditService {
    */
   static async log(entry: Omit<AuditLogEntry, "timestamp">): Promise<void> {
     try {
-      await db.insert(auditLogs).values({
+      await createAuditLog({
+        id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         eventType: entry.eventType,
         severity: entry.severity,
-        userId: entry.userId,
-        organizationId: entry.organizationId,
-        ipAddress: entry.ipAddress,
-        userAgent: entry.userAgent,
+        userId: entry.userId || null,
+        organizationId: entry.organizationId || null,
+        ipAddress: entry.ipAddress || null,
+        userAgent: entry.userAgent || null,
         metadata: entry.metadata ? JSON.stringify(entry.metadata) : null,
         timestamp: new Date(),
       });
