@@ -43,6 +43,13 @@
       "when": 1760807332666,
       "tag": "0005_puzzling_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1760874975286,
+      "tag": "0006_dry_sinister_six",
+      "breakpoints": true
     }
   ]
 }
