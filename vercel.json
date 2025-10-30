@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
+  "buildCommand": "bash build.sh",
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "framework": null,
