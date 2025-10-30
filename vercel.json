@@ -4,60 +4,6 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": null,
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/dist/public/assets/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
-    }
-  ],
-  "public": "dist/public",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
-    },
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ]
+  "public": "dist/public"
 }
 
