@@ -1,44 +1,31 @@
 {
   "version": 2,
-  "buildCommand": "bash build.sh",
+  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": null,
   "outputDirectory": "dist",
   "public": "dist/public",
-  "builds": [
-    {
-      "src": "dist/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    },
-    {
-      "src": "dist/public/**/*",
-      "use": "@vercel/static"
+  "functions": {
+    "dist/index.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/dist/index.js"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/dist/public/assets/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/public/index.html"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
   },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/dist/index.js"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "/dist/public/assets/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/dist/public/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -49,19 +36,20 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "DENY"
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
-        },
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
         {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=()"
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
