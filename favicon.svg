@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Fundo azul gradiente -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Círculo de fundo -->
+  <circle cx="32" cy="32" r="30" fill="url(#grad)"/>
+  
+  <!-- Letra K -->
+  <path d="M 18 18 L 18 46 L 22 46 L 22 33 L 32 46 L 37 46 L 27 33 L 36 18 L 31 18 L 22 31 L 22 18 Z" fill="white" stroke="white" stroke-width="0.5"/>
+  
+  <!-- Letra F -->
+  <path d="M 40 18 L 40 46 L 44 46 L 44 33 L 52 33 L 52 29 L 44 29 L 44 22 L 54 22 L 54 18 Z" fill="white" stroke="white" stroke-width="0.5"/>
+</svg>
+
