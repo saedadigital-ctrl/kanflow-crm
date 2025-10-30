@@ -7,7 +7,10 @@ node_modules
 .next
 out
 build
-dist
 .turbo
 .vercel
+server/
+drizzle/
+# Keep only dist/public for static hosting
+!dist/public
 
