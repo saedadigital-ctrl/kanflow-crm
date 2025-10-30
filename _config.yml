@@ -1,0 +1,28 @@
+# GitHub Pages Configuration for KanFlow CRM
+# This file enables GitHub Pages hosting
+
+# Site configuration
+title: KanFlow CRM
+description: CRM WhatsApp com Pipeline Kanban
+url: https://saedadigital-ctrl.github.io/kanflow-crm
+
+# Build settings
+markdown: kramdown
+theme: null
+
+# Exclude files from processing
+exclude:
+  - node_modules
+  - pnpm-lock.yaml
+  - .gitignore
+  - README.md
+  - LICENSE
+
+# Keep files that should not be processed
+keep_files:
+  - dist
+  - assets
+
+# Disable Jekyll processing
+plugins: []
+
