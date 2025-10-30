@@ -1,11 +1,6 @@
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { createApp } from "../dist/serverless.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const app = createApp();
 
-// Import the built server
-const { default: handler } = await import(join(__dirname, "../dist/index.js"));
-
-export default handler;
+export default app;
 
