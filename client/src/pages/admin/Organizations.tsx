@@ -53,7 +53,7 @@ export default function Organizations() {
     reason: "",
   });
 
-  const { data: organizations, isLoading, refetch } = trpc.admin.organizations.list.useQuery({
+  const { data: organizations, isPending, refetch } = trpc.admin.organizations.list.useQuery({
     limit: 100,
     offset: 0,
   });
@@ -227,7 +227,7 @@ export default function Organizations() {
             <CardTitle>Organizações</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isPending ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
@@ -365,15 +365,15 @@ export default function Organizations() {
               <Button
                 onClick={handleAction}
                 disabled={
-                  suspendMutation.isLoading ||
-                  activateMutation.isLoading ||
-                  cancelMutation.isLoading
+                  suspendMutation.isPending ||
+                  activateMutation.isPending ||
+                  cancelMutation.isPending
                 }
                 variant={actionDialog.type === "cancel" ? "destructive" : "default"}
               >
-                {(suspendMutation.isLoading ||
-                  activateMutation.isLoading ||
-                  cancelMutation.isLoading) && (
+                {(suspendMutation.isPending ||
+                  activateMutation.isPending ||
+                  cancelMutation.isPending) && (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 )}
                 Confirmar
