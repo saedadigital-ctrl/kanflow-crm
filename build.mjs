@@ -141,13 +141,18 @@ try {
   if (fs.existsSync(entryPoint)) {
     console.log(`✅ Entry point found: ${entryPoint}\n`);
 
-    // Copy the entry point to dist/index.js for backward compatibility
+    // Create a stub entry point at dist/index.js for compatibility
     const fallbackEntry = path.join(distDir, 'index.js');
     try {
-      fs.copyFileSync(entryPoint, fallbackEntry);
-      console.log('✅ Copied entry point to dist/index.js for compatibility');
-    } catch (copyErr) {
-      console.warn('⚠️  Failed to copy entry point to dist/index.js:', copyErr.message);
+      fs.writeFileSync(
+        fallbackEntry,
+        "// Auto-generated entry stub. Do not edit.\n" +
+        "import './src/_core/index.js';\n",
+        'utf8'
+      );
+      console.log('✅ Created entry stub at dist/index.js');
+    } catch (stubErr) {
+      console.warn('⚠️  Failed to create entry stub at dist/index.js:', stubErr.message);
     }
   } else {
     console.warn(`⚠️  Entry point not found at expected location\n`);
