@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
   "framework": null,
+  "nodeVersion": "22.x",
   "public": "dist/public",
   "env": {
+    "NODE_ENV": "production",
     "DATABASE_URL": "@database_url",
     "JWT_SECRET": "@jwt_secret",
     "VITE_APP_ID": "@vite_app_id",
@@ -17,6 +19,13 @@
     "VITE_APP_LOGO": "@vite_app_logo",
     "BUILT_IN_FORGE_API_URL": "@built_in_forge_api_url",
     "BUILT_IN_FORGE_API_KEY": "@built_in_forge_api_key"
+  },
+  "functions": {
+    "dist/index.js": {
+      "runtime": "nodejs22.x",
+      "memory": 1024,
+      "maxDuration": 60
+    }
   }
 }
 

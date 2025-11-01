@@ -1,16 +1,45 @@
+# Git
 .git
 .gitignore
+
+# Documentação
 README.md
+CHANGELOG.md
+docs/
+
+# Variáveis de ambiente
 .env.local
 .env.*.local
+
+# Dependências
 node_modules
+.pnpm-store
+
+# Build
 .next
 out
 build
 .turbo
 .vercel
-server/
-drizzle/
-# Keep only dist/public for static hosting
-!dist/public
+
+# Testes
+__tests__
+test/
+*.test.ts
+*.spec.ts
+coverage/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Misc
+.cache
+turbo.json
+
+# Keep dist for deployment
+!dist/
 
