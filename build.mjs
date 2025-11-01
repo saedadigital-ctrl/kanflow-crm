@@ -128,10 +128,27 @@ try {
 
   // Step 6: Create a simple entry point if needed
   console.log('✅ Verifying build output...');
-  const entryPoint = path.join(distDir, 'server/_core/index.js');
+  let entryPoint = path.join(distDir, 'server/_core/index.js');
+  
+  // Check multiple possible entry points
+  if (!fs.existsSync(entryPoint)) {
+    entryPoint = path.join(distDir, 'src/_core/index.js');
+  }
+  if (!fs.existsSync(entryPoint)) {
+    entryPoint = path.join(distDir, 'src/index.js');
+  }
   
   if (fs.existsSync(entryPoint)) {
-    console.log(`✅ Entry point found: dist/server/_core/index.js\n`);
+    console.log(`✅ Entry point found: ${entryPoint}\n`);
+
+    // Copy the entry point to dist/index.js for backward compatibility
+    const fallbackEntry = path.join(distDir, 'index.js');
+    try {
+      fs.copyFileSync(entryPoint, fallbackEntry);
+      console.log('✅ Copied entry point to dist/index.js for compatibility');
+    } catch (copyErr) {
+      console.warn('⚠️  Failed to copy entry point to dist/index.js:', copyErr.message);
+    }
   } else {
     console.warn(`⚠️  Entry point not found at expected location\n`);
   }

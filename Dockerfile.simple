@@ -22,5 +22,6 @@ COPY dist/server ./server
 EXPOSE 3000
 
 # Start server
+# Use npm start which points to dist/index.js (created by postbuild script)
 CMD ["npm", "start"]
 

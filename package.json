@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
-    "build": "vite build && tsc --project tsconfig.server.json --skipLibCheck --noEmitOnError false 2>/dev/null || true && node build-server.mjs",
-    "start": "NODE_ENV=production node dist/src/_core/index.js",
+    "build": "vite build && tsc --project tsconfig.server.json --skipLibCheck --noEmitOnError false 2>/dev/null || true && node build-server.mjs && npm run postbuild",
+    "start": "NODE_ENV=production node dist/index.js",
+    "postbuild": "mkdir -p dist && if [ -f dist/src/_core/index.js ]; then cp dist/src/_core/index.js dist/index.js; elif [ -f dist/server/_core/index.js ]; then cp dist/server/_core/index.js dist/index.js; elif [ -f dist/src/index.js ]; then cp dist/src/index.js dist/index.js; fi",
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
