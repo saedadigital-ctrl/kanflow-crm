@@ -128,9 +128,12 @@ try {
 
   // Step 6: Create a simple entry point if needed
   console.log('✅ Verifying build output...');
-  let entryPoint = path.join(distDir, 'server/_core/index.js');
+  let entryPoint = path.join(distDir, '_core/index.js');
   
   // Check multiple possible entry points
+  if (!fs.existsSync(entryPoint)) {
+    entryPoint = path.join(distDir, 'server/_core/index.js');
+  }
   if (!fs.existsSync(entryPoint)) {
     entryPoint = path.join(distDir, 'src/_core/index.js');
   }
@@ -147,7 +150,7 @@ try {
       fs.writeFileSync(
         fallbackEntry,
         "// Auto-generated entry stub. Do not edit.\n" +
-        "import './src/_core/index.js';\n",
+        "import './_core/index.js';\n",
         'utf8'
       );
       console.log('✅ Created entry stub at dist/index.js');

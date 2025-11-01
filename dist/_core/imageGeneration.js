@@ -1,4 +1,4 @@
-import { storagePut } from "./storage.js";
+import { storagePut } from "server/storage";
 import { ENV } from "./env.js";
 export async function generateImage(options) {
     if (!ENV.forgeApiUrl) {

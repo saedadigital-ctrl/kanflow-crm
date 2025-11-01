@@ -22,6 +22,6 @@ COPY dist/server ./server
 EXPOSE 3000
 
 # Start server
-# Executa o stub que redireciona para o arquivo compilado correto
-CMD ["node", "dist/index.js"]
+# Executa com loader para resolver aliases @shared
+CMD ["node", "--loader", "./dist/alias-loader.mjs", "dist/index.js"]
 
