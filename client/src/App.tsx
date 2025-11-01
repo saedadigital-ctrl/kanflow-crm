@@ -31,6 +31,7 @@ import ConversationManager from "./pages/ConversationManager";
 import MyLicense from "./pages/MyLicense";
 import LandingPage from "./pages/LandingPage";
 import DevLogin from "./pages/DevLogin";
+import LandingPageShowcase from "./pages/LandingPageShowcase";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -120,6 +121,7 @@ function Router() {
 
       <Switch>
         {/* Public Routes */}
+        <Route path="/" component={LandingPageShowcase} />
         <Route path="/home" component={LandingPage} />
         <Route path="/login" component={Login} />
         <Route path="/dev-login" component={DevLogin} />
@@ -128,9 +130,6 @@ function Router() {
         <Route path="/404" component={NotFound} />
 
         {/* Protected Routes */}
-        <Route path="/">
-          {isAuthenticated ? <Redirect to="/dashboard" /> : <Redirect to="/login" />}
-        </Route>
         <Route path="/dashboard">
           <ProtectedRoute component={Dashboard} />
         </Route>
