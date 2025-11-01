@@ -106,5 +106,26 @@ export const notificationsRouter = router({
       await upsertNotificationPreferences(updated);
       return updated;
     }),
+
+  /**
+   * Deletar notificação
+   */
+  deleteNotification: protectedProcedure
+    .input(z.object({
+      notificationId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // TODO: Implementar soft delete no banco
+      return { success: true };
+    }),
+
+  /**
+   * Marcar todas as notificações como lidas
+   */
+  markAllAsRead: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      // TODO: Implementar marcar todas como lidas
+      return { success: true };
+    }),
 });
 

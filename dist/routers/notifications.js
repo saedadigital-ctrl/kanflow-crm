@@ -73,4 +73,15 @@ export const notificationsRouter = router({
         await upsertNotificationPreferences(updated);
         return updated;
     }),
+    deleteNotification: protectedProcedure
+        .input(z.object({
+        notificationId: z.string(),
+    }))
+        .mutation(async ({ ctx, input }) => {
+        return { success: true };
+    }),
+    markAllAsRead: protectedProcedure
+        .mutation(async ({ ctx }) => {
+        return { success: true };
+    }),
 });
