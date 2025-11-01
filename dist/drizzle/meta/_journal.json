@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1760668735729,
+      "tag": "0000_red_matthew_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1760668786851,
+      "tag": "0001_hot_proemial_gods",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1760675503095,
+      "tag": "0002_busy_dragon_lord",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1760676668933,
+      "tag": "0003_typical_mentallo",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1760789744518,
+      "tag": "0004_bizarre_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1760807332666,
+      "tag": "0005_puzzling_living_mummy",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1760874975286,
+      "tag": "0006_dry_sinister_six",
+      "breakpoints": true
+    }
+  ]
+}

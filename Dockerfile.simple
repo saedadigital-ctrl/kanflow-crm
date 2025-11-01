@@ -1,0 +1,26 @@
+# Simple Dockerfile - Frontend Only (Recomendado para começar)
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+COPY pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN npm install -g pnpm
+RUN pnpm install --prod
+
+# Copy built files (já compilados localmente)
+COPY dist/public ./public
+COPY drizzle ./drizzle
+
+# Copy server files (já compilados)
+COPY dist/server ./server
+
+# Expose port
+EXPOSE 3000
+
+# Start server
+CMD ["npm", "start"]
+
