@@ -44,9 +44,20 @@ import {
   whatsappWebhooks,
   InsertWhatsappWebhook,
   licenses,
-  InsertLicense
+  InsertLicense,
+  notifications,
+  InsertNotification,
+  notificationPreferences,
+  InsertNotificationPreference
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { eq } from 'drizzle-orm';
+import { v4 as uuidv4 } from 'uuid';
+
+// Emitter de eventos para notificações
+import { EventEmitter } from 'events';
+export const notificationEmitter = new EventEmitter();
+notificationEmitter.setMaxListeners(100);
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -1138,4 +1149,133 @@ export async function cancelOrganization(organizationId: string, reason: string)
     timestamp: new Date(),
   });
 }
+
+
+
+
+// ============================================
+// NOTIFICATIONS FUNCTIONS
+// ============================================
+
+/**
+ * Create a notification
+ */
+export async function createNotification(notification: InsertNotification) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const id = uuidv4();
+  await db.insert(notifications).values({
+    ...notification,
+    id,
+  });
+
+  return id;
+}
+
+/**
+ * Get notifications for a user
+ */
+export async function getUserNotifications(userId: string, limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Mark notification as read
+ */
+export async function markNotificationAsRead(notificationId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(eq(notifications.id, notificationId));
+}
+
+/**
+ * Mark multiple notifications as read
+ */
+export async function markNotificationsAsRead(notificationIds: string[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (notificationIds.length === 0) return;
+
+  await db
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(inArray(notifications.id, notificationIds));
+}
+
+/**
+ * Get user notification preferences
+ */
+export async function getNotificationPreferences(userId: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(notificationPreferences)
+    .where(eq(notificationPreferences.userId, userId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+/**
+ * Create or update notification preferences
+ */
+export async function upsertNotificationPreferences(prefs: InsertNotificationPreference) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .insert(notificationPreferences)
+    .values(prefs)
+    .onDuplicateKeyUpdate({
+      set: {
+        enableSound: prefs.enableSound,
+        muteFrom: prefs.muteFrom,
+        muteTo: prefs.muteTo,
+        whatsappMessage: prefs.whatsappMessage,
+        kanbanMove: prefs.kanbanMove,
+        contactUpdate: prefs.contactUpdate,
+        channels: prefs.channels,
+        updatedAt: new Date(),
+      },
+    });
+}
+
+/**
+ * Count unread notifications
+ */
+export async function countUnreadNotifications(userId: string) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const result = await db
+    .select({ count: count() })
+    .from(notifications)
+    .where(
+      and(
+        eq(notifications.userId, userId),
+        isNull(notifications.readAt)
+      )
+    );
+
+  return result[0]?.count || 0;
+}
+
+// Import missing functions
+import { desc, inArray, count, and, isNull } from 'drizzle-orm';
 

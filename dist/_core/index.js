@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth.js";
 import { appRouter } from "../routers.js";
 import { createContext } from "./context.js";
 import { serveStatic, setupVite } from "./vite.js";
+import { initializeWebSocket } from "../websocket.js";
 function isPortAvailable(port) {
     return new Promise(resolve => {
         const server = net.createServer();
@@ -27,6 +28,7 @@ async function findAvailablePort(startPort = 3000) {
 async function startServer() {
     const app = express();
     const server = createServer(app);
+    initializeWebSocket(server);
     app.use(express.json({ limit: "50mb" }));
     app.use(express.urlencoded({ limit: "50mb", extended: true }));
     registerOAuthRoutes(app);
@@ -34,6 +36,9 @@ async function startServer() {
         router: appRouter,
         createContext,
     }));
+    app.get('/health', (req, res) => {
+        res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    });
     if (process.env.NODE_ENV === "development") {
         await setupVite(app, server);
     }
@@ -46,7 +51,11 @@ async function startServer() {
         console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
     }
     server.listen(port, () => {
-        console.log(`Server running on http://localhost:${port}/`);
+        console.log(`[Server] Running on http://localhost:${port}/`);
+        console.log(`[WebSocket] Real-time notifications enabled`);
     });
 }
-startServer().catch(console.error);
+startServer().catch((error) => {
+    console.error('[Server] Fatal error:', error);
+    process.exit(1);
+});

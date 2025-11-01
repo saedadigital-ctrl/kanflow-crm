@@ -3,6 +3,7 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "../db";
 import { nanoid } from "nanoid";
+import { NotificationService } from "../services/notificationService";
 
 export const whatsappRouter = router({
   // ==================== ACCOUNTS ====================

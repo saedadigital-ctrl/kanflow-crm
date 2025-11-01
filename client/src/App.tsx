@@ -32,6 +32,7 @@ import MyLicense from "./pages/MyLicense";
 import LandingPage from "./pages/LandingPage";
 import DevLogin from "./pages/DevLogin";
 import LandingPageShowcase from "./pages/LandingPageShowcase";
+import NotificationPreferences from "./pages/NotificationPreferences";
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -162,6 +163,9 @@ function Router() {
         </Route>
         <Route path="/my-license">
           <ProtectedRoute component={MyLicense} />
+        </Route>
+        <Route path="/notification-preferences">
+          <ProtectedRoute component={NotificationPreferences} />
         </Route>
 
         {/* Admin Routes */}

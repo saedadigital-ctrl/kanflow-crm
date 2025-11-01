@@ -50,6 +50,20 @@
       "when": 1760874975286,
       "tag": "0006_dry_sinister_six",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1762031496532,
+      "tag": "0007_bizarre_silver_sable",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1762031517065,
+      "tag": "0008_hot_penance",
+      "breakpoints": true
     }
   ]
 }

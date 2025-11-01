@@ -5,6 +5,7 @@ import { securityRouter } from "./routers/security.js";
 import { adminRouter } from "./routers/admin.js";
 import { clientRouter } from "./routers/clientRouter.js";
 import { whatsappRouter } from "./routers/whatsapp.js";
+import { notificationsRouter } from "./routers/notifications.js";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc.js";
 import { z } from "zod";
 import * as db from "./db.js";
@@ -15,6 +16,7 @@ export const appRouter = router({
     admin: adminRouter,
     app: clientRouter,
     whatsapp: whatsappRouter,
+    notifications: notificationsRouter,
     auth: router({
         me: publicProcedure.query(opts => opts.ctx.user),
         logout: publicProcedure.mutation(({ ctx }) => {

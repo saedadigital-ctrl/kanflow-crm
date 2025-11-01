@@ -51,3 +51,47 @@
 - **GitHub Pages**: https://saedadigital-ctrl.github.io/kanflow-crm/
 - **Production**: (domínio customizado a configurar)
 
+
+
+## Sistema de Notificações em Tempo Real 🔔
+
+- [ ] Criar schema de notificações no banco de dados
+  - [ ] Tabela `notifications` (id, userId, type, title, body, entityType, entityId, channel, readAt, createdAt)
+  - [ ] Tabela `notification_preferences` (userId, enableSound, muteFrom, muteTo, whatsappMessage, kanbanMove, contactUpdate, channels)
+  - [ ] Migrations Drizzle
+
+- [ ] Implementar serviço de notificações no backend
+  - [ ] NotificationService com método emit()
+  - [ ] EventEmitter para whatsapp.message.received, kanban.card.moved, contact.created/updated
+  - [ ] Respeitar preferências de usuário
+  - [ ] Salvar notificações no banco
+
+- [ ] Configurar WebSocket para comunicação em tempo real
+  - [ ] Integrar Socket.io ou ws nativo
+  - [ ] Namespace /realtime com rooms user:{userId} e team:{teamId}
+  - [ ] Autenticação de usuário via JWT
+  - [ ] Broadcast de eventos para usuários autorizados
+
+- [ ] Criar hooks e componentes React para notificações
+  - [ ] Hook useNotifications() para conectar ao WebSocket
+  - [ ] Componente Toast com Sonner
+  - [ ] Componente Badge com contador
+  - [ ] Dropdown de notificações recentes
+
+- [ ] Integrar notificações com eventos de WhatsApp e Kanban
+  - [ ] Emitir evento ao receber mensagem WhatsApp
+  - [ ] Emitir evento ao mover card no Kanban
+  - [ ] Emitir evento ao criar/atualizar contato
+
+- [ ] Criar UI para gerenciar preferências de notificações
+  - [ ] Página de Preferências com toggles
+  - [ ] Página "Todas as Notificações" com filtros e busca
+  - [ ] Marcar notificações como lidas
+  - [ ] Configurar som e horário de silêncio
+
+- [ ] Testar sistema de notificações
+  - [ ] Testar WebSocket em desenvolvimento
+  - [ ] Testar persistência de notificações
+  - [ ] Testar preferências de usuário
+  - [ ] Testar em múltiplas abas/janelas
+

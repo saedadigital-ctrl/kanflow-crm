@@ -270,3 +270,34 @@ export const auditLogs = mysqlTable("audit_logs", {
     timestamp: timestamp("timestamp").defaultNow().notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
 });
+export const notifications = mysqlTable("notifications", {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    userId: varchar("userId", { length: 64 }).notNull(),
+    type: mysqlEnum("type", [
+        "WHATSAPP_MESSAGE",
+        "KANBAN_MOVE",
+        "CONTACT_CREATED",
+        "CONTACT_UPDATED",
+        "DEAL_CREATED",
+        "DEAL_UPDATED",
+    ]).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    body: text("body").notNull(),
+    entityType: varchar("entityType", { length: 50 }),
+    entityId: varchar("entityId", { length: 64 }),
+    channel: varchar("channel", { length: 50 }).default("websocket"),
+    readAt: timestamp("readAt"),
+    createdAt: timestamp("createdAt").defaultNow(),
+});
+export const notificationPreferences = mysqlTable("notification_preferences", {
+    userId: varchar("userId", { length: 64 }).primaryKey(),
+    enableSound: boolean("enableSound").default(true).notNull(),
+    muteFrom: varchar("muteFrom", { length: 5 }),
+    muteTo: varchar("muteTo", { length: 5 }),
+    whatsappMessage: boolean("whatsappMessage").default(true).notNull(),
+    kanbanMove: boolean("kanbanMove").default(true).notNull(),
+    contactUpdate: boolean("contactUpdate").default(false).notNull(),
+    channels: text("channels"),
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});

@@ -443,3 +443,51 @@ export const auditLogs = mysqlTable("audit_logs", {
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
 
+
+
+
+/**
+ * Notifications - Histórico de notificações em tempo real
+ */
+export const notifications = mysqlTable("notifications", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(), // destinatário
+  type: mysqlEnum("type", [
+    "WHATSAPP_MESSAGE",
+    "KANBAN_MOVE",
+    "CONTACT_CREATED",
+    "CONTACT_UPDATED",
+    "DEAL_CREATED",
+    "DEAL_UPDATED",
+  ]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+  entityType: varchar("entityType", { length: 50 }), // "message", "deal", "contact", "card"
+  entityId: varchar("entityId", { length: 64 }), // ID do recurso relacionado
+  channel: varchar("channel", { length: 50 }).default("websocket"), // "websocket", "email", "push"
+  readAt: timestamp("readAt"), // null = não lido
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * Notification Preferences - Preferências de notificação por usuário
+ */
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  userId: varchar("userId", { length: 64 }).primaryKey(),
+  enableSound: boolean("enableSound").default(true).notNull(),
+  muteFrom: varchar("muteFrom", { length: 5 }), // HH:mm (ex: "22:00")
+  muteTo: varchar("muteTo", { length: 5 }), // HH:mm (ex: "08:00")
+  whatsappMessage: boolean("whatsappMessage").default(true).notNull(),
+  kanbanMove: boolean("kanbanMove").default(true).notNull(),
+  contactUpdate: boolean("contactUpdate").default(false).notNull(),
+  channels: text("channels"), // JSON array: ["websocket", "email", "push"]
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type NotificationPreference = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+
