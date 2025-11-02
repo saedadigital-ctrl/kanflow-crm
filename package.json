@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "vite build && tsc -p tsconfig.server.json --skipLibCheck --noEmitOnError false && tsc-alias -p tsconfig.server.json && node build-server.mjs",
-    "start": "NODE_ENV=production node dist/_core/index.js",
-    "postbuild": "mkdir -p dist && echo \"// Auto-generated entry stub\\nimport './server/_core/index.js';\" > dist/index.js && cp vite.config.ts dist/vite.config.js || true",
+    "start": "NODE_ENV=production node --loader tsx server.ts",
+    "postbuild": "echo 'Build complete'",
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
