@@ -1,7 +1,11 @@
 import { Server as SocketIOServer } from 'socket.io';
-import { notificationEmitter } from "./db.js";
+import { notificationEmitter } from './db';
 import jwt from 'jsonwebtoken';
+// Map de usuários conectados
 const connectedUsers = new Map();
+/**
+ * Inicializar WebSocket com Socket.io
+ */
 export function initializeWebSocket(httpServer) {
     const io = new SocketIOServer(httpServer, {
         cors: {
@@ -11,6 +15,7 @@ export function initializeWebSocket(httpServer) {
         },
         transports: ['websocket', 'polling'],
     });
+    // Middleware de autenticação
     io.use((socket, next) => {
         const token = socket.handshake.auth.token;
         if (!token) {
@@ -27,19 +32,24 @@ export function initializeWebSocket(httpServer) {
             next(new Error('Token inválido'));
         }
     });
+    // Conexão
     io.on('connection', (socket) => {
         const userId = socket.data.userId;
         console.log(`[WebSocket] Usuário ${userId} conectado (${socket.id})`);
+        // Adicionar usuário à lista de conectados
         if (!connectedUsers.has(userId)) {
             connectedUsers.set(userId, new Set());
         }
         connectedUsers.get(userId).add(socket.id);
+        // Juntar ao room do usuário
         socket.join(`user:${userId}`);
+        // Enviar confirmação de conexão
         socket.emit('connected', {
             userId,
             socketId: socket.id,
             timestamp: new Date().toISOString(),
         });
+        // Desconexão
         socket.on('disconnect', () => {
             console.log(`[WebSocket] Usuário ${userId} desconectado (${socket.id})`);
             const userSockets = connectedUsers.get(userId);
@@ -50,10 +60,13 @@ export function initializeWebSocket(httpServer) {
                 }
             }
         });
+        // Marcar notificação como lida
         socket.on('notification:read', (data) => {
             console.log(`[WebSocket] Notificação ${data.notificationId} marcada como lida`);
+            // Evento será processado via tRPC
         });
     });
+    // Listener de eventos de notificação
     notificationEmitter.on('notification:new', (notification) => {
         const { userId, ...payload } = notification;
         console.log(`[WebSocket] Emitindo notificação para ${userId}`);
@@ -61,9 +74,15 @@ export function initializeWebSocket(httpServer) {
     });
     return io;
 }
+/**
+ * Obter número de usuários conectados
+ */
 export function getConnectedUsersCount() {
     return connectedUsers.size;
 }
+/**
+ * Verificar se usuário está conectado
+ */
 export function isUserConnected(userId) {
     return connectedUsers.has(userId) && connectedUsers.get(userId).size > 0;
 }

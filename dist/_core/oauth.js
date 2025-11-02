@@ -1,7 +1,7 @@
-import { COOKIE_NAME, ONE_YEAR_MS } from '../shared/const.js';
-import * as db from "../db.js";
-import { getSessionCookieOptions } from "./cookies.js";
-import { sdk } from "./sdk.js";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import * as db from "../db";
+import { getSessionCookieOptions } from "./cookies";
+import { sdk } from "./sdk";
 function getQueryParam(req, key) {
     const value = req.query[key];
     return typeof value === "string" ? value : undefined;

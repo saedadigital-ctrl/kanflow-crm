@@ -1,7 +1,10 @@
 import { z } from 'zod';
-import { protectedProcedure, router } from "../_core/trpc.js";
-import { getUserNotifications, markNotificationAsRead, markNotificationsAsRead, getNotificationPreferences, upsertNotificationPreferences, countUnreadNotifications } from "../db.js";
+import { protectedProcedure, router } from '../_core/trpc';
+import { getUserNotifications, markNotificationAsRead, markNotificationsAsRead, getNotificationPreferences, upsertNotificationPreferences, countUnreadNotifications } from '../db';
 export const notificationsRouter = router({
+    /**
+     * Obter notificações do usuário
+     */
     list: protectedProcedure
         .input(z.object({
         limit: z.number().default(20),
@@ -11,11 +14,17 @@ export const notificationsRouter = router({
         const notifications = await getUserNotifications(ctx.user.id, input.limit);
         return notifications;
     }),
+    /**
+     * Contar notificações não lidas
+     */
     countUnread: protectedProcedure
         .query(async ({ ctx }) => {
         const count = await countUnreadNotifications(ctx.user.id);
         return { unreadCount: count };
     }),
+    /**
+     * Marcar notificação como lida
+     */
     markRead: protectedProcedure
         .input(z.object({
         notificationId: z.string(),
@@ -24,6 +33,9 @@ export const notificationsRouter = router({
         await markNotificationAsRead(input.notificationId);
         return { success: true };
     }),
+    /**
+     * Marcar múltiplas notificações como lidas
+     */
     markMultipleRead: protectedProcedure
         .input(z.object({
         notificationIds: z.array(z.string()),
@@ -34,6 +46,9 @@ export const notificationsRouter = router({
         }
         return { success: true };
     }),
+    /**
+     * Obter preferências de notificação
+     */
     getPreferences: protectedProcedure
         .query(async ({ ctx }) => {
         const prefs = await getNotificationPreferences(ctx.user.id);
@@ -48,6 +63,9 @@ export const notificationsRouter = router({
             channels: JSON.stringify(['websocket']),
         };
     }),
+    /**
+     * Atualizar preferências de notificação
+     */
     updatePreferences: protectedProcedure
         .input(z.object({
         enableSound: z.boolean().optional(),
@@ -73,15 +91,23 @@ export const notificationsRouter = router({
         await upsertNotificationPreferences(updated);
         return updated;
     }),
+    /**
+     * Deletar notificação
+     */
     deleteNotification: protectedProcedure
         .input(z.object({
         notificationId: z.string(),
     }))
         .mutation(async ({ ctx, input }) => {
+        // TODO: Implementar soft delete no banco
         return { success: true };
     }),
+    /**
+     * Marcar todas as notificações como lidas
+     */
     markAllAsRead: protectedProcedure
         .mutation(async ({ ctx }) => {
+        // TODO: Implementar marcar todas como lidas
         return { success: true };
     }),
 });

@@ -1,4 +1,7 @@
-import { mysqlEnum, mysqlTable, text, timestamp, varchar, int, boolean } from "drizzle-orm/mysql-core";
+import { mysqlEnum, mysqlTable, text, timestamp, varchar, int } from "drizzle-orm/mysql-core";
+/**
+ * Users table - backing auth flow
+ */
 export const users = mysqlTable("users", {
     id: varchar("id", { length: 64 }).primaryKey(),
     name: text("name"),
@@ -8,6 +11,9 @@ export const users = mysqlTable("users", {
     createdAt: timestamp("createdAt").defaultNow(),
     lastSignedIn: timestamp("lastSignedIn").defaultNow(),
 });
+/**
+ * Pipeline stages for Kanban board
+ */
 export const pipelineStages = mysqlTable("pipeline_stages", {
     id: varchar("id", { length: 64 }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -18,6 +24,9 @@ export const pipelineStages = mysqlTable("pipeline_stages", {
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 });
+/**
+ * Contacts
+ */
 export const contacts = mysqlTable("contacts", {
     id: varchar("id", { length: 64 }).primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
@@ -25,13 +34,15 @@ export const contacts = mysqlTable("contacts", {
     email: varchar("email", { length: 320 }),
     avatarUrl: text("avatarUrl"),
     notes: text("notes"),
-    tags: text("tags"),
     stageId: varchar("stageId", { length: 64 }),
     userId: varchar("userId", { length: 64 }).notNull(),
     lastMessageAt: timestamp("lastMessageAt"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 });
+/**
+ * Messages
+ */
 export const messages = mysqlTable("messages", {
     id: varchar("id", { length: 64 }).primaryKey(),
     contactId: varchar("contactId", { length: 64 }).notNull(),
@@ -42,262 +53,4 @@ export const messages = mysqlTable("messages", {
     mediaType: varchar("mediaType", { length: 50 }),
     sentBy: varchar("sentBy", { length: 64 }),
     createdAt: timestamp("createdAt").defaultNow(),
-});
-export const whatsappIntegrations = mysqlTable("whatsapp_integrations", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    phoneNumber: varchar("phoneNumber", { length: 20 }).notNull(),
-    businessAccountId: varchar("businessAccountId", { length: 255 }),
-    accessToken: text("accessToken"),
-    webhookVerifyToken: varchar("webhookVerifyToken", { length: 255 }),
-    isActive: boolean("isActive").default(true),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const automations = mysqlTable("automations", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    name: varchar("name", { length: 255 }).notNull(),
-    description: text("description"),
-    trigger: varchar("trigger", { length: 100 }).notNull(),
-    triggerConfig: text("triggerConfig"),
-    action: varchar("action", { length: 100 }).notNull(),
-    actionConfig: text("actionConfig"),
-    isActive: boolean("isActive").default(true),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const aiAgents = mysqlTable("ai_agents", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    name: varchar("name", { length: 255 }).notNull(),
-    systemPrompt: text("systemPrompt").notNull(),
-    temperature: int("temperature").default(70),
-    isActive: boolean("isActive").default(true),
-    autoReply: boolean("autoReply").default(false),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const consents = mysqlTable("consents", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    type: mysqlEnum("type", ["terms", "privacy", "marketing"]).notNull(),
-    accepted: boolean("accepted").default(false).notNull(),
-    acceptedAt: timestamp("acceptedAt"),
-    revokedAt: timestamp("revokedAt"),
-    ipAddress: varchar("ipAddress", { length: 45 }),
-    userAgent: text("userAgent"),
-    version: varchar("version", { length: 20 }).default("1.0"),
-});
-export const lgpdRequests = mysqlTable("lgpd_requests", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    type: mysqlEnum("type", ["deletion", "portability", "correction"]).notNull(),
-    status: mysqlEnum("status", ["pending", "processing", "completed", "rejected"]).default("pending").notNull(),
-    reason: text("reason"),
-    requestedAt: timestamp("requestedAt").defaultNow(),
-    completedAt: timestamp("completedAt"),
-    completedBy: varchar("completedBy", { length: 64 }),
-    notes: text("notes"),
-});
-export const organizations = mysqlTable("organizations", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    name: varchar("name", { length: 255 }).notNull(),
-    slug: varchar("slug", { length: 255 }).notNull().unique(),
-    ownerId: varchar("ownerId", { length: 64 }).notNull(),
-    email: varchar("email", { length: 320 }),
-    phone: varchar("phone", { length: 20 }),
-    cnpj: varchar("cnpj", { length: 18 }),
-    address: text("address"),
-    status: mysqlEnum("status", ["active", "suspended", "cancelled"]).default("active").notNull(),
-    maxUsers: int("maxUsers").default(5).notNull(),
-    currentUsers: int("currentUsers").default(1).notNull(),
-    maxContacts: int("maxContacts").default(1000).notNull(),
-    maxWhatsappNumbers: int("maxWhatsappNumbers").default(1).notNull(),
-    trialEndsAt: timestamp("trialEndsAt"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const organizationMembers = mysqlTable("organization_members", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    role: mysqlEnum("role", ["owner", "admin", "member"]).default("member").notNull(),
-    joinedAt: timestamp("joinedAt").defaultNow(),
-});
-export const subscriptionPlans = mysqlTable("subscription_plans", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    name: varchar("name", { length: 255 }).notNull(),
-    description: text("description"),
-    price: int("price").notNull(),
-    billingCycle: mysqlEnum("billingCycle", ["monthly", "quarterly", "yearly"]).default("monthly").notNull(),
-    maxUsers: int("maxUsers").notNull(),
-    maxContacts: int("maxContacts").notNull(),
-    maxWhatsappNumbers: int("maxWhatsappNumbers").notNull(),
-    features: text("features"),
-    isActive: boolean("isActive").default(true).notNull(),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const subscriptions = mysqlTable("subscriptions", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    planId: varchar("planId", { length: 64 }).notNull(),
-    status: mysqlEnum("status", ["active", "past_due", "cancelled", "expired"]).default("active").notNull(),
-    currentPeriodStart: timestamp("currentPeriodStart").notNull(),
-    currentPeriodEnd: timestamp("currentPeriodEnd").notNull(),
-    cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false).notNull(),
-    cancelledAt: timestamp("cancelledAt"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const payments = mysqlTable("payments", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    subscriptionId: varchar("subscriptionId", { length: 64 }).notNull(),
-    amount: int("amount").notNull(),
-    status: mysqlEnum("status", ["pending", "paid", "failed", "refunded"]).default("pending").notNull(),
-    paymentMethod: varchar("paymentMethod", { length: 50 }),
-    transactionId: varchar("transactionId", { length: 255 }),
-    paidAt: timestamp("paidAt"),
-    dueDate: timestamp("dueDate"),
-    createdAt: timestamp("createdAt").defaultNow(),
-});
-export const usageLogs = mysqlTable("usage_logs", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    metric: varchar("metric", { length: 100 }).notNull(),
-    value: int("value").notNull(),
-    date: timestamp("date").notNull(),
-    createdAt: timestamp("createdAt").defaultNow(),
-});
-export const whatsappAccounts = mysqlTable("whatsapp_accounts", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    phoneNumber: varchar("phoneNumber", { length: 20 }).notNull().unique(),
-    displayName: varchar("displayName", { length: 255 }),
-    accessToken: text("accessToken"),
-    businessAccountId: varchar("businessAccountId", { length: 255 }),
-    phoneNumberId: varchar("phoneNumberId", { length: 255 }),
-    status: mysqlEnum("status", ["connected", "disconnected", "expired"]).default("disconnected").notNull(),
-    isDefault: boolean("isDefault").default(false).notNull(),
-    lastSyncedAt: timestamp("lastSyncedAt"),
-    expiresAt: timestamp("expiresAt"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const whatsappConversations = mysqlTable("whatsapp_conversations", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
-    contactId: varchar("contactId", { length: 64 }).notNull(),
-    waContactId: varchar("waContactId", { length: 255 }),
-    status: mysqlEnum("status", ["active", "archived", "closed"]).default("active").notNull(),
-    lastMessageAt: timestamp("lastMessageAt"),
-    unreadCount: int("unreadCount").default(0).notNull(),
-    assignedTo: varchar("assignedTo", { length: 64 }),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const whatsappMessages = mysqlTable("whatsapp_messages", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    conversationId: varchar("conversationId", { length: 64 }).notNull(),
-    whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
-    waMessageId: varchar("waMessageId", { length: 255 }).unique(),
-    direction: mysqlEnum("direction", ["inbound", "outbound"]).notNull(),
-    messageType: mysqlEnum("messageType", ["text", "image", "document", "audio", "video", "template"]).default("text").notNull(),
-    content: text("content"),
-    mediaUrl: text("mediaUrl"),
-    status: mysqlEnum("status", ["sent", "delivered", "read", "failed"]).default("sent").notNull(),
-    senderPhone: varchar("senderPhone", { length: 20 }),
-    senderName: varchar("senderName", { length: 255 }),
-    isFromBot: boolean("isFromBot").default(false).notNull(),
-    automationId: varchar("automationId", { length: 64 }),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const whatsappTemplates = mysqlTable("whatsapp_templates", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
-    name: varchar("name", { length: 255 }).notNull(),
-    category: mysqlEnum("category", ["marketing", "authentication", "utility"]).default("utility").notNull(),
-    language: varchar("language", { length: 10 }).default("pt_BR").notNull(),
-    headerText: text("headerText"),
-    bodyText: text("bodyText").notNull(),
-    footerText: text("footerText"),
-    buttons: text("buttons"),
-    status: mysqlEnum("status", ["approved", "pending", "rejected"]).default("pending").notNull(),
-    waTemplateId: varchar("waTemplateId", { length: 255 }),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const whatsappWebhooks = mysqlTable("whatsapp_webhooks", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    whatsappAccountId: varchar("whatsappAccountId", { length: 64 }).notNull(),
-    webhookUrl: text("webhookUrl").notNull(),
-    verifyToken: varchar("verifyToken", { length: 255 }).notNull(),
-    isActive: boolean("isActive").default(true).notNull(),
-    lastReceivedAt: timestamp("lastReceivedAt"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const licenses = mysqlTable("licenses", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    organizationId: varchar("organizationId", { length: 64 }).notNull(),
-    licenseKey: varchar("licenseKey", { length: 255 }).notNull().unique(),
-    status: mysqlEnum("status", ["active", "suspended", "expired", "cancelled"]).default("active").notNull(),
-    startDate: timestamp("startDate").notNull(),
-    expiryDate: timestamp("expiryDate").notNull(),
-    renewalDate: timestamp("renewalDate"),
-    lastAccessDate: timestamp("lastAccessDate"),
-    accessCount: int("accessCount").default(0),
-    reason: text("reason"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-});
-export const auditLogs = mysqlTable("audit_logs", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    eventType: varchar("eventType", { length: 100 }).notNull(),
-    severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).notNull(),
-    userId: varchar("userId", { length: 64 }),
-    organizationId: varchar("organizationId", { length: 64 }),
-    ipAddress: varchar("ipAddress", { length: 45 }),
-    userAgent: text("userAgent"),
-    metadata: text("metadata"),
-    timestamp: timestamp("timestamp").defaultNow().notNull(),
-    createdAt: timestamp("createdAt").defaultNow(),
-});
-export const notifications = mysqlTable("notifications", {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    userId: varchar("userId", { length: 64 }).notNull(),
-    type: mysqlEnum("type", [
-        "WHATSAPP_MESSAGE",
-        "KANBAN_MOVE",
-        "CONTACT_CREATED",
-        "CONTACT_UPDATED",
-        "DEAL_CREATED",
-        "DEAL_UPDATED",
-    ]).notNull(),
-    title: varchar("title", { length: 255 }).notNull(),
-    body: text("body").notNull(),
-    entityType: varchar("entityType", { length: 50 }),
-    entityId: varchar("entityId", { length: 64 }),
-    channel: varchar("channel", { length: 50 }).default("websocket"),
-    readAt: timestamp("readAt"),
-    createdAt: timestamp("createdAt").defaultNow(),
-});
-export const notificationPreferences = mysqlTable("notification_preferences", {
-    userId: varchar("userId", { length: 64 }).primaryKey(),
-    enableSound: boolean("enableSound").default(true).notNull(),
-    muteFrom: varchar("muteFrom", { length: 5 }),
-    muteTo: varchar("muteTo", { length: 5 }),
-    whatsappMessage: boolean("whatsappMessage").default(true).notNull(),
-    kanbanMove: boolean("kanbanMove").default(true).notNull(),
-    contactUpdate: boolean("contactUpdate").default(false).notNull(),
-    channels: text("channels"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
 });

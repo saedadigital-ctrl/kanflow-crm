@@ -5,28 +5,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 export default function DevLogin() {
   const [, setLocation] = useLocation();
   const [role, setRole] = useState<"admin" | "user">("admin");
+  const demoLoginMutation = trpc.auth.demoLogin.useMutation();
 
-  const handleDevLogin = (selectedRole: "admin" | "user") => {
-    // Simular login de desenvolvimento
-    const mockUser = {
-      id: selectedRole === "admin" ? "dev-admin-001" : "dev-user-001",
-      name: selectedRole === "admin" ? "Admin Dev" : "User Dev",
-      email: `${selectedRole}@dev.local`,
-      role: selectedRole,
-    };
-
-    // Salvar no localStorage para simular sessão
-    localStorage.setItem("dev_user", JSON.stringify(mockUser));
-    
-    // Redirecionar baseado no role
-    if (selectedRole === "admin") {
-      setLocation("/admin");
-    } else {
-      setLocation("/dashboard");
+  const handleDevLogin = async (selectedRole: "admin" | "user") => {
+    try {
+      const result = await demoLoginMutation.mutateAsync({ role: selectedRole });
+      
+      if (result.success) {
+        toast.success(`Bem-vindo, ${result.user.name}!`);
+        // Redirecionar baseado no role
+        if (selectedRole === "admin") {
+          setLocation("/admin");
+        } else {
+          setLocation("/dashboard");
+        }
+      }
+    } catch (error) {
+      console.error("Demo login error:", error);
+      toast.error("Erro ao fazer login de demo. Tente novamente.");
     }
   };
 
@@ -75,8 +77,9 @@ export default function DevLogin() {
               className="w-full"
               size="lg"
               onClick={() => handleDevLogin(role)}
+              disabled={demoLoginMutation.isPending}
             >
-              Entrar como {role === "admin" ? "Admin" : "Usuário"}
+              {demoLoginMutation.isPending ? "Entrando..." : `Entrar como ${role === "admin" ? "Admin" : "Usuário"}`}
             </Button>
           </div>
 

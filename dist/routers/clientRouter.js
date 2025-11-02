@@ -1,11 +1,15 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc.js";
-import { getOrganizationLicense, getOrganizationWhatsappAccounts, getOrganizationConversations, getConversationMessages, createWhatsappAccount, updateWhatsappAccount, updateWhatsappConversation, createWhatsappMessage, getOrganization, createAuditLog, logUsage, } from "../db.js";
+import { protectedProcedure, router } from "../_core/trpc";
+import { getOrganizationLicense, getOrganizationWhatsappAccounts, getOrganizationConversations, getConversationMessages, createWhatsappAccount, updateWhatsappAccount, updateWhatsappConversation, createWhatsappMessage, getOrganization, createAuditLog, logUsage, } from "../db";
 import { nanoid } from "nanoid";
 export const clientRouter = router({
+    /**
+     * Get client's license information
+     */
     getLicense: protectedProcedure
         .input(z.object({ organizationId: z.string() }))
         .query(async ({ input, ctx }) => {
+        // TODO: Verify user belongs to organization
         const license = await getOrganizationLicense(input.organizationId);
         if (!license) {
             return {
@@ -13,6 +17,7 @@ export const clientRouter = router({
                 message: "Nenhuma licença ativa encontrada",
             };
         }
+        // Check if license is active
         if (license.status !== "active") {
             return {
                 status: license.status,
@@ -20,6 +25,7 @@ export const clientRouter = router({
                 reason: license.reason,
             };
         }
+        // Check if license is expired
         if (new Date() > license.expiryDate) {
             return {
                 status: "expired",
@@ -39,11 +45,18 @@ export const clientRouter = router({
             },
         };
     }),
+    /**
+     * Get client's WhatsApp accounts
+     */
     getWhatsappAccounts: protectedProcedure
         .input(z.object({ organizationId: z.string() }))
         .query(async ({ input }) => {
+        // TODO: Verify user belongs to organization
         return await getOrganizationWhatsappAccounts(input.organizationId);
     }),
+    /**
+     * Connect WhatsApp account
+     */
     connectWhatsappAccount: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
@@ -54,6 +67,8 @@ export const clientRouter = router({
         phoneNumberId: z.string(),
     }))
         .mutation(async ({ input, ctx }) => {
+        // TODO: Verify user belongs to organization
+        // TODO: Verify license allows more WhatsApp accounts
         const accountId = nanoid();
         try {
             await createWhatsappAccount({
@@ -61,12 +76,13 @@ export const clientRouter = router({
                 organizationId: input.organizationId,
                 phoneNumber: input.phoneNumber,
                 displayName: input.displayName,
-                accessToken: input.accessToken,
+                accessToken: input.accessToken, // TODO: Encrypt this
                 businessAccountId: input.businessAccountId,
                 phoneNumberId: input.phoneNumberId,
                 status: "connected",
                 isDefault: false,
             });
+            // Log the action
             await createAuditLog({
                 id: `audit_${Date.now()}_${Math.random()}`,
                 eventType: "whatsapp_connected",
@@ -78,6 +94,7 @@ export const clientRouter = router({
                 metadata: JSON.stringify({ phoneNumber: input.phoneNumber, accountId }),
                 timestamp: new Date(),
             });
+            // Log usage
             await logUsage({
                 id: `usage_${Date.now()}_${Math.random()}`,
                 organizationId: input.organizationId,
@@ -92,15 +109,20 @@ export const clientRouter = router({
             throw new Error("Falha ao conectar conta WhatsApp");
         }
     }),
+    /**
+     * Disconnect WhatsApp account
+     */
     disconnectWhatsappAccount: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
         accountId: z.string(),
     }))
         .mutation(async ({ input, ctx }) => {
+        // TODO: Verify user belongs to organization and account
         await updateWhatsappAccount(input.accountId, {
             status: "disconnected",
         });
+        // Log the action
         await createAuditLog({
             id: `audit_${Date.now()}_${Math.random()}`,
             eventType: "whatsapp_disconnected",
@@ -114,14 +136,21 @@ export const clientRouter = router({
         });
         return { success: true };
     }),
+    /**
+     * Get conversations for organization
+     */
     getConversations: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
         status: z.enum(["active", "archived", "closed"]).optional(),
     }))
         .query(async ({ input }) => {
+        // TODO: Verify user belongs to organization
         return await getOrganizationConversations(input.organizationId, input.status);
     }),
+    /**
+     * Get messages for a conversation
+     */
     getConversationMessages: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
@@ -129,8 +158,12 @@ export const clientRouter = router({
         limit: z.number().min(1).max(100).default(50),
     }))
         .query(async ({ input }) => {
+        // TODO: Verify user belongs to organization and conversation
         return await getConversationMessages(input.conversationId, input.limit);
     }),
+    /**
+     * Send message in conversation
+     */
     sendMessage: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
@@ -141,6 +174,8 @@ export const clientRouter = router({
         mediaUrl: z.string().optional(),
     }))
         .mutation(async ({ input, ctx }) => {
+        // TODO: Verify user belongs to organization
+        // TODO: Verify license allows sending messages
         const messageId = nanoid();
         try {
             await createWhatsappMessage({
@@ -156,9 +191,11 @@ export const clientRouter = router({
                 status: "sent",
                 isFromBot: false,
             });
+            // Update conversation last message time
             await updateWhatsappConversation(input.conversationId, {
                 lastMessageAt: new Date(),
             });
+            // Log usage
             await logUsage({
                 id: `usage_${Date.now()}_${Math.random()}`,
                 organizationId: input.organizationId,
@@ -166,6 +203,7 @@ export const clientRouter = router({
                 value: 1,
                 date: new Date(),
             });
+            // Log the action
             await createAuditLog({
                 id: `audit_${Date.now()}_${Math.random()}`,
                 eventType: "message_sent",
@@ -184,6 +222,9 @@ export const clientRouter = router({
             throw new Error("Falha ao enviar mensagem");
         }
     }),
+    /**
+     * Update conversation status
+     */
     updateConversationStatus: protectedProcedure
         .input(z.object({
         organizationId: z.string(),
@@ -191,9 +232,11 @@ export const clientRouter = router({
         status: z.enum(["active", "archived", "closed"]),
     }))
         .mutation(async ({ input, ctx }) => {
+        // TODO: Verify user belongs to organization
         await updateWhatsappConversation(input.conversationId, {
             status: input.status,
         });
+        // Log the action
         await createAuditLog({
             id: `audit_${Date.now()}_${Math.random()}`,
             eventType: "conversation_status_updated",
@@ -207,9 +250,13 @@ export const clientRouter = router({
         });
         return { success: true };
     }),
+    /**
+     * Get organization info (for client area)
+     */
     getOrganizationInfo: protectedProcedure
         .input(z.object({ organizationId: z.string() }))
         .query(async ({ input }) => {
+        // TODO: Verify user belongs to organization
         const org = await getOrganization(input.organizationId);
         if (!org) {
             throw new Error("Organização não encontrada");

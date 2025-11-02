@@ -1,94 +1,124 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SalesFunnel } from "@/components/SalesFunnel";
-import { DistributionChart } from "@/components/DistributionChart";
-import { ArrowUpRight } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Users, MessageSquare, TrendingUp, Activity } from "lucide-react";
 
 export default function Dashboard() {
-  // Dados mockados baseados na imagem de referência
+  const { data: stats, isLoading } = trpc.dashboard.stats.useQuery();
+
+  if (isLoading) {
+    return <DashboardLayout><div className="flex items-center justify-center min-h-screen">Carregando...</div></DashboardLayout>;
+  }
+
   const metrics = [
     {
-      title: "Total Contatos",
-      value: "1,207",
-      change: "+10.2%",
-      positive: true,
+      title: "Total de Contatos",
+      value: stats?.totalContacts || 0,
+      icon: Users,
+      color: "bg-blue-100 text-blue-600",
     },
     {
-      title: "Mensagens",
-      value: "3,456",
-      change: "+2.5%",
-      positive: true,
-    },
-    {
-      title: "Taxa Conversão",
-      value: "32,5%",
-      change: "+4.1%",
-      positive: true,
-    },
-    {
-      title: "Contatos Ativos",
-      value: "803",
-      change: "+0.8%",
-      positive: true,
+      title: "Estágios do Pipeline",
+      value: stats?.totalStages || 0,
+      icon: TrendingUp,
+      color: "bg-green-100 text-green-600",
     },
   ];
 
-  // Dados do funil de vendas
-  const funnelData = [
-    { name: "Novo Lead", value: 100, percentage: 21 },
-    { name: "Contato Inicial", value: 80, percentage: 24 },
-    { name: "Negociação", value: 60, percentage: 25 },
-  ];
-
-  // Dados da distribuição (gráfico de rosca)
-  const distributionData = [
-    { name: "Novo Lead", value: 21, color: "#1E40AF" },
-    { name: "Contato Inicial", value: 24, color: "#06B6D4" },
-    { name: "Negociação", value: 25, color: "#3B82F6" },
-    { name: "Fechado", value: 30, color: "#10B981" },
-  ];
+  // Dados para gráfico de contatos por estágio
+  const chartData = stats?.contactsByStage || [];
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">Bem-vindo ao KanFlow - Seu CRM WhatsApp</p>
         </div>
 
-        {/* Cards de Métricas */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {metrics.map((metric, index) => (
-            <Card key={index}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {metric.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <div className="text-3xl font-bold">{metric.value}</div>
-                  <div
-                    className={`flex items-center text-sm font-semibold ${
-                      metric.positive ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {metric.positive && <ArrowUpRight className="h-4 w-4 mr-1" />}
-                    {metric.change}
+        {/* Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
+                  <div className={`p-2 rounded-lg ${metric.color}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{metric.value}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        {/* Gráficos */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Funil de Vendas */}
-          <SalesFunnel data={funnelData} />
+        {/* Charts */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Contatos por Estágio</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="stageName" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#3b82f6" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                Nenhum dado disponível
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Distribuição */}
-          <DistributionChart data={distributionData} title="Distribuição" />
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Contatos Novos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {chartData.find(s => s.stageName === "Leads")?.count || 0}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">No estágio de Leads</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Em Contato</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {chartData.find(s => s.stageName === "Contacting")?.count || 0}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Sendo contatados</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Negociando</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {chartData.find(s => s.stageName === "Negotiating")?.count || 0}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Em negociação</p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </DashboardLayout>

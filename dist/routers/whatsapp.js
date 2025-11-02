@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc.js";
+import { router, protectedProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
-import * as db from "../db.js";
+import * as db from "../db";
 import { nanoid } from "nanoid";
 export const whatsappRouter = router({
+    // ==================== ACCOUNTS ====================
     accounts: router({
         list: protectedProcedure.query(async ({ ctx }) => {
+            // TODO: Implementar verificação de organização do usuário
+            // Por enquanto, retorna todas as contas (será filtrado por org)
             return await db.getOrganizationWhatsappAccounts(ctx.user.id);
         }),
         get: protectedProcedure
@@ -27,6 +30,7 @@ export const whatsappRouter = router({
             phoneNumberId: z.string(),
         }))
             .mutation(async ({ input }) => {
+            // Verificar se já existe uma conta com este número
             const existing = await db.getOrganizationWhatsappAccounts(input.organizationId);
             const phoneExists = existing.some(acc => acc.phoneNumber === input.phoneNumber);
             if (phoneExists) {
@@ -44,7 +48,7 @@ export const whatsappRouter = router({
                 businessAccountId: input.businessAccountId,
                 phoneNumberId: input.phoneNumberId,
                 status: "connected",
-                isDefault: existing.length === 0,
+                isDefault: existing.length === 0, // Primeira conta é padrão
             });
             return account;
         }),
@@ -75,6 +79,7 @@ export const whatsappRouter = router({
             return { success: true, message: 'Conta deletada com sucesso' };
         }),
     }),
+    // ==================== CONVERSATIONS ====================
     conversations: router({
         list: protectedProcedure
             .input(z.object({
@@ -129,6 +134,7 @@ export const whatsappRouter = router({
             return { success: true, message: 'Conversa fechada com sucesso' };
         }),
     }),
+    // ==================== MESSAGES ====================
     messages: router({
         send: protectedProcedure
             .input(z.object({
@@ -139,9 +145,11 @@ export const whatsappRouter = router({
             mediaUrl: z.string().optional(),
         }))
             .mutation(async ({ input, ctx }) => {
+            // TODO: Implementar integração com Meta WhatsApp API
+            // Por enquanto, apenas registra a mensagem no banco
             const message = await db.createWhatsappMessage({
                 id: nanoid(),
-                organizationId: ctx.user.id,
+                organizationId: ctx.user.id, // TODO: usar organizationId correto
                 conversationId: input.conversationId,
                 whatsappAccountId: input.whatsappAccountId,
                 direction: "outbound",
@@ -149,7 +157,7 @@ export const whatsappRouter = router({
                 content: input.content,
                 mediaUrl: input.mediaUrl,
                 status: "sent",
-                senderPhone: "",
+                senderPhone: "", // Será preenchido pela API
                 isFromBot: false,
             });
             return message;
@@ -163,6 +171,7 @@ export const whatsappRouter = router({
             return { success: true };
         }),
     }),
+    // ==================== TEMPLATES ====================
     templates: router({
         list: protectedProcedure
             .input(z.object({ organizationId: z.string() }))
@@ -184,9 +193,10 @@ export const whatsappRouter = router({
             headerText: z.string().optional(),
             bodyText: z.string(),
             footerText: z.string().optional(),
-            buttons: z.string().optional(),
+            buttons: z.string().optional(), // JSON string
         }))
             .mutation(async ({ input }) => {
+            // TODO: Integrar com Meta para submeter template para aprovação
             const template = await db.createWhatsappTemplate({
                 id: nanoid(),
                 organizationId: input.organizationId,
@@ -198,7 +208,7 @@ export const whatsappRouter = router({
                 bodyText: input.bodyText,
                 footerText: input.footerText,
                 buttons: input.buttons,
-                status: "pending",
+                status: "pending", // Aguardando aprovação da Meta
             });
             return template;
         }),
@@ -206,11 +216,12 @@ export const whatsappRouter = router({
             .input(z.object({ id: z.string() }))
             .mutation(async ({ input }) => {
             await db.updateWhatsappTemplate(input.id, {
-                status: "rejected",
+                status: "rejected", // Soft delete
             });
             return { success: true };
         }),
     }),
+    // ==================== WEBHOOKS ====================
     webhooks: router({
         getForAccount: protectedProcedure
             .input(z.object({ whatsappAccountId: z.string() }))
@@ -223,6 +234,7 @@ export const whatsappRouter = router({
             whatsappAccountId: z.string(),
         }))
             .mutation(async ({ input }) => {
+            // TODO: Gerar webhook URL único para esta organização
             const webhookUrl = `${process.env.APP_URL || 'http://localhost:3000'}/api/webhooks/whatsapp/${input.organizationId}`;
             const verifyToken = nanoid(32);
             const webhook = await db.createWhatsappWebhook({
@@ -240,10 +252,12 @@ export const whatsappRouter = router({
             };
         }),
     }),
+    // ==================== STATS ====================
     stats: router({
         accountStats: protectedProcedure
             .input(z.object({ accountId: z.string() }))
             .query(async ({ input }) => {
+            // TODO: Implementar cálculo de estatísticas
             return {
                 totalConversations: 0,
                 activeConversations: 0,

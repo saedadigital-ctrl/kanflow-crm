@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc.js";
+import { router, protectedProcedure } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
-import * as db from "../db.js";
+import * as db from "../db";
 import { nanoid } from "nanoid";
+// Middleware para verificar se usuário é admin
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
     if (ctx.user.role !== 'admin') {
         throw new TRPCError({
@@ -13,6 +14,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
     return next({ ctx });
 });
 export const adminRouter = router({
+    // ==================== ORGANIZATIONS ====================
     organizations: router({
         list: adminProcedure.query(async () => {
             return await db.getAllOrganizations();
@@ -90,6 +92,7 @@ export const adminRouter = router({
             return await db.getOrganizationMembers(input.organizationId);
         }),
     }),
+    // ==================== SUBSCRIPTION PLANS ====================
     plans: router({
         list: adminProcedure.query(async () => {
             return await db.getAllSubscriptionPlans();
@@ -131,6 +134,7 @@ export const adminRouter = router({
             return { success: true };
         }),
     }),
+    // ==================== SUBSCRIPTIONS ====================
     subscriptions: router({
         create: adminProcedure
             .input(z.object({
@@ -160,6 +164,7 @@ export const adminRouter = router({
             return await db.getOrganizationSubscription(input.organizationId);
         }),
     }),
+    // ==================== PAYMENTS ====================
     payments: router({
         list: adminProcedure
             .input(z.object({ organizationId: z.string() }))
@@ -202,6 +207,7 @@ export const adminRouter = router({
             return { success: true, message: 'Pagamento marcado como falhou' };
         }),
     }),
+    // ==================== USAGE LOGS ====================
     usage: router({
         getByOrganization: adminProcedure
             .input(z.object({
@@ -212,13 +218,14 @@ export const adminRouter = router({
             return await db.getOrganizationUsage(input.organizationId, input.metric);
         }),
     }),
+    // ==================== DASHBOARD STATS ====================
     stats: adminProcedure.query(async () => {
         const allOrgs = await db.getAllOrganizations();
         const activeOrgs = allOrgs.filter(o => o.status === 'active').length;
         const suspendedOrgs = allOrgs.filter(o => o.status === 'suspended').length;
         const cancelledOrgs = allOrgs.filter(o => o.status === 'cancelled').length;
         const totalUsers = allOrgs.reduce((sum, org) => sum + (org.currentUsers || 0), 0);
-        const totalRevenue = 0;
+        const totalRevenue = 0; // TODO: calcular da tabela payments
         return {
             totalOrganizations: allOrgs.length,
             activeOrganizations: activeOrgs,

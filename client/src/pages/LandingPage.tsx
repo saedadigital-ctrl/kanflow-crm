@@ -74,9 +74,11 @@ export default function LandingPage() {
                 Começar Grátis por 14 Dias
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6">
-                Ver Demonstração
-              </Button>
+              <a href="/dev-login">
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6" asChild>
+                  <span>Ver Demonstração</span>
+                </Button>
+              </a>
             </div>
             <div className="flex items-center gap-8 pt-4">
               <div className="flex items-center gap-2">

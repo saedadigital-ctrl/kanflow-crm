@@ -1,10 +1,11 @@
-import { AXIOS_TIMEOUT_MS, COOKIE_NAME, ONE_YEAR_MS } from '../shared/const.js';
-import { ForbiddenError } from '../shared/_core/errors.js';
+import { AXIOS_TIMEOUT_MS, COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { ForbiddenError } from "@shared/_core/errors";
 import axios from "axios";
 import { parse as parseCookieHeader } from "cookie";
 import { SignJWT, jwtVerify } from "jose";
-import * as db from "../db.js";
-import { ENV } from "./env.js";
+import * as db from "../db";
+import { ENV } from "./env";
+// Utility function
 const isNonEmptyString = (value) => typeof value === "string" && value.length > 0;
 const EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
@@ -67,9 +68,19 @@ class SDKServer {
         const first = Array.from(set)[0];
         return first ? first.toLowerCase() : null;
     }
+    /**
+     * Exchange OAuth authorization code for access token
+     * @example
+     * const tokenResponse = await sdk.exchangeCodeForToken(code, state);
+     */
     async exchangeCodeForToken(code, state) {
         return this.oauthService.getTokenByCode(code, state);
     }
+    /**
+     * Get user information using access token
+     * @example
+     * const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
+     */
     async getUserInfo(accessToken) {
         const data = await this.oauthService.getUserInfoByToken({
             accessToken,
@@ -92,6 +103,11 @@ class SDKServer {
         const secret = ENV.cookieSecret;
         return new TextEncoder().encode(secret);
     }
+    /**
+     * Create a session token for a user ID
+     * @example
+     * const sessionToken = await sdk.createSessionToken(userInfo.id);
+     */
     async createSessionToken(userId, options = {}) {
         return this.signSession({
             openId: userId,
@@ -155,6 +171,7 @@ class SDKServer {
         };
     }
     async authenticateRequest(req) {
+        // Regular authentication flow
         const cookies = this.parseCookies(req.headers.cookie);
         const sessionCookie = cookies.get(COOKIE_NAME);
         const session = await this.verifySession(sessionCookie);
@@ -164,6 +181,7 @@ class SDKServer {
         const sessionUserId = session.openId;
         const signedInAt = new Date();
         let user = await db.getUser(sessionUserId);
+        // If user not in DB, sync from OAuth server automatically
         if (!user) {
             try {
                 const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");

@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { ENV } from "./env.js";
+import { ENV } from "./env";
 const TITLE_MAX_LENGTH = 1200;
 const CONTENT_MAX_LENGTH = 20000;
 const trimValue = (value) => value.trim();
@@ -39,6 +39,12 @@ const validatePayload = (input) => {
     }
     return { title, content };
 };
+/**
+ * Dispatches a project-owner notification through the Manus Notification Service.
+ * Returns `true` if the request was accepted, `false` when the upstream service
+ * cannot be reached (callers can fall back to email/slack). Validation errors
+ * bubble up as TRPC errors so callers can fix the payload.
+ */
 export async function notifyOwner(payload) {
     const { title, content } = validatePayload(payload);
     if (!ENV.forgeApiUrl) {

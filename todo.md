@@ -66,3 +66,63 @@
 - [ ] Implementar notificações por email
 - [ ] Adicionar notificações push mobile
 
+
+
+## Demo Mode Features
+
+- [x] Ativar seed de dados automatico ao iniciar servidor
+- [x] Liberar login de demo em producao (nao apenas dev)
+- [x] Adicionar dados mockados ao Dashboard
+- [x] Adicionar dados mockados ao Pipeline
+- [x] Criar 8 contatos de demo com dados realistas
+- [x] Criar 3 usuarios de demo para teste
+- [x] Indicacao visual de que esta em modo demo
+
+
+
+## # KanFlow - Hub de Comunicação com Agente de IA
+
+## Paleta de Cores
+- Azul Profissional: #1E40AF
+- Azul Claro: #06B6D4
+- Verde: #10B981
+- Cinza: #664748BA
+
+### Fase 1: Simplificar Arquitetura
+- [ ] Remover páginas desnecessárias (Analytics, Organizations)
+- [ ] Manter apenas: Pipeline, Chats, Contatos, Settings
+- [ ] Simplificar sidebar
+- [ ] Remover erros de TypeScript
+
+### Fase 2: Integração com Agente de IA
+- [x] Implementar LLM integration (já existe no template)
+- [x] Criar tRPC procedure para análise de mensagens
+- [x] Criar tRPC procedure para gerar respostas
+- [ ] Integrar com invokeLLM do servidor (próximo passo)
+
+### Fase 3: Respostas Automáticas com IA
+- [x] Adicionar botão "Sugerir resposta" em cada mensagem
+- [x] Mostrar resposta gerada pela IA
+- [x] Permitir editar antes de enviar
+- [ ] Enviar resposta
+- [ ] Histórico de respostas da IA
+
+### Fase 4: Múltiplos Canais
+- [ ] Expandir Chats para mostrar canal (WhatsApp, Email, etc)
+- [ ] Adicionar ícones de canal
+- [ ] Filtrar por canal
+- [ ] Integração placeholder WhatsApp
+- [ ] Integração placeholder Email
+- [ ] Integração placeholder Instagram
+- [ ] Integração placeholder Telegram
+
+### Fase 5: Teste e Deploy
+- [ ] Testar fluxo completo
+- [ ] Salvar checkpoint
+- [ ] Push para GitHub
+
+## Bugs Atuais
+
+- [x] Demo login não redireciona para dashboard após cadastro (CORRIGIDO)
+- [ ] TypeScript errors em páginas removidas (será resolvido na Fase 1)
+

@@ -1,15 +1,18 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc.js";
-import { upsertConsent, getUserConsents, hasAcceptedConsents, createAuditLog, getAuditLogs, createLgpdRequest, getLgpdRequests, } from "../db.js";
+import { protectedProcedure, router } from "../_core/trpc";
+import { upsertConsent, getUserConsents, hasAcceptedConsents, createAuditLog, getAuditLogs, createLgpdRequest, getLgpdRequests, } from "../db";
 import { nanoid } from "nanoid";
 export const securityRouter = router({
+    // Check if user has accepted consents
     checkConsents: protectedProcedure.query(async ({ ctx }) => {
         const hasAccepted = await hasAcceptedConsents(ctx.user.id);
         return { hasAccepted };
     }),
+    // Get user consents
     getConsents: protectedProcedure.query(async ({ ctx }) => {
         return await getUserConsents(ctx.user.id);
     }),
+    // Accept consents (terms, privacy)
     acceptConsents: protectedProcedure
         .input(z.object({
         terms: z.boolean(),
@@ -20,6 +23,7 @@ export const securityRouter = router({
         const now = new Date();
         const ipAddress = ctx.req.ip || ctx.req.socket.remoteAddress || "unknown";
         const userAgent = ctx.req.headers["user-agent"] || "unknown";
+        // Create consent records
         if (input.terms) {
             await upsertConsent({
                 id: nanoid(),
@@ -56,6 +60,7 @@ export const securityRouter = router({
                 version: "1.0",
             });
         }
+        // Log the action
         await createAuditLog({
             id: nanoid(),
             eventType: "consent_accepted",
@@ -69,6 +74,7 @@ export const securityRouter = router({
         });
         return { success: true };
     }),
+    // Get audit logs (user can see their own)
     getMyAuditLogs: protectedProcedure
         .input(z.object({
         limit: z.number().optional(),
@@ -81,6 +87,7 @@ export const securityRouter = router({
             offset: input.offset,
         });
     }),
+    // Request data deletion (LGPD Art. 18)
     requestDeletion: protectedProcedure
         .input(z.object({
         reason: z.string().optional(),
@@ -96,6 +103,7 @@ export const securityRouter = router({
             reason: input.reason,
             requestedAt: new Date(),
         });
+        // Log the action
         await createAuditLog({
             id: nanoid(),
             eventType: "data_deletion_requested",
@@ -109,6 +117,7 @@ export const securityRouter = router({
         });
         return { success: true, message: "Sua solicitação foi recebida e será processada em até 7 dias úteis." };
     }),
+    // Request data export (LGPD Art. 18 - Portability)
     requestExport: protectedProcedure.mutation(async ({ ctx }) => {
         const ipAddress = ctx.req.ip || ctx.req.socket.remoteAddress || "unknown";
         const userAgent = ctx.req.headers["user-agent"] || "unknown";
@@ -119,6 +128,7 @@ export const securityRouter = router({
             status: "pending",
             requestedAt: new Date(),
         });
+        // Log the action
         await createAuditLog({
             id: nanoid(),
             eventType: "data_export_requested",
@@ -132,6 +142,7 @@ export const securityRouter = router({
         });
         return { success: true, message: "Seus dados serão exportados e enviados por email em breve." };
     }),
+    // Get my LGPD requests
     getMyRequests: protectedProcedure.query(async ({ ctx }) => {
         return await getLgpdRequests({ userId: ctx.user.id });
     }),

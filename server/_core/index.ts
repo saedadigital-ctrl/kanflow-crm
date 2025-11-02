@@ -7,7 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeWebSocket } from "../websocket";
+import { seedDemoData } from "../seed-demo-data";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -32,8 +32,16 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Inicializar WebSocket
-  initializeWebSocket(server);
+  // Seed de dados de demo em desenvolvimento
+  if (process.env.NODE_ENV === "development" || process.env.SEED_DEMO === "true") {
+    try {
+      await seedDemoData();
+    } catch (error) {
+      console.warn('[Seed] Demo data seed failed (non-fatal):', error);
+    }
+  }
+  
+
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

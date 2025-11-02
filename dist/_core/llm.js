@@ -1,4 +1,4 @@
-import { ENV } from "./env.js";
+import { ENV } from "./env";
 const ensureArray = (value) => (Array.isArray(value) ? value : [value]);
 const normalizeContentPart = (part) => {
     if (typeof part === "string") {
@@ -29,6 +29,7 @@ const normalizeMessage = (message) => {
         };
     }
     const contentParts = ensureArray(message.content).map(normalizeContentPart);
+    // If there's only text content, collapse to a single string for compatibility
     if (contentParts.length === 1 && contentParts[0].type === "text") {
         return {
             role,

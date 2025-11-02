@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { 
@@ -139,9 +140,11 @@ export default function LandingPageShowcase() {
             <Button size="lg" onClick={() => window.location.href = getLoginUrl()}>
               Começar Agora <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline">
-              Ver Demo
-            </Button>
+            <Link href="/dev-login">
+              <Button size="lg" variant="outline" asChild>
+                <span>Ver Demo</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
