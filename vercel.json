@@ -6,6 +6,17 @@
   "framework": null,
   "nodeVersion": "22.x",
   "public": "dist/public",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ],
   "env": {
     "NODE_ENV": "production",
     "DATABASE_URL": "@database_url",
@@ -21,7 +32,7 @@
     "BUILT_IN_FORGE_API_KEY": "@built_in_forge_api_key"
   },
   "functions": {
-    "dist/index.js": {
+    "dist/_core/index.js": {
       "runtime": "nodejs22.x",
       "memory": 1024,
       "maxDuration": 60
