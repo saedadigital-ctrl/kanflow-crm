@@ -32,7 +32,7 @@
     "BUILT_IN_FORGE_API_KEY": "@built_in_forge_api_key"
   },
   "functions": {
-    "server.ts": {
+    "server.js": {
       "runtime": "nodejs22.x",
       "memory": 1024,
       "maxDuration": 60

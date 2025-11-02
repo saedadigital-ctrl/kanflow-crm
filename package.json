@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "vite build && tsc -p tsconfig.server.json --skipLibCheck --noEmitOnError false && tsc-alias -p tsconfig.server.json && node build-server.mjs",
-    "start": "NODE_ENV=production node --loader tsx server.ts",
+    "start": "NODE_ENV=production node server.js",
     "postbuild": "echo 'Build complete'",
     "check": "tsc --noEmit",
     "format": "prettier --write .",

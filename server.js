@@ -13,12 +13,7 @@ app.use(express.static(path.join(__dirname, 'dist/public')));
 
 // Rota para servir index.html em todas as rotas que não são API
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) {
-    // Deixar APIs passarem
-    res.status(404).json({ error: 'API not found' });
-  } else {
-    res.sendFile(path.join(__dirname, 'dist/public/index.html'));
-  }
+  res.sendFile(path.join(__dirname, 'dist/public/index.html'));
 });
 
 app.listen(PORT, () => {
