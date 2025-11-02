@@ -15,7 +15,7 @@
  *     }]
  *   });
  */
-import { storagePut } from "../server/storage.js";
+import { storagePut } from "../../server/storage.js";
 import { ENV } from "./env.js";
 export async function generateImage(options) {
     if (!ENV.forgeApiUrl) {

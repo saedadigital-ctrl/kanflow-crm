@@ -1,5 +1,5 @@
 import { Server as SocketIOServer } from 'socket.io';
-import { notificationEmitter } from './db';
+import { notificationEmitter } from "./db.js";
 import jwt from 'jsonwebtoken';
 // Map de usuários conectados
 const connectedUsers = new Map();

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc";
-import { upsertConsent, getUserConsents, hasAcceptedConsents, createAuditLog, getAuditLogs, createLgpdRequest, getLgpdRequests, } from "../db";
+import { protectedProcedure, router } from "../_core/trpc.js";
+import { upsertConsent, getUserConsents, hasAcceptedConsents, createAuditLog, getAuditLogs, createLgpdRequest, getLgpdRequests, } from "../db.js";
 import { nanoid } from "nanoid";
 export const securityRouter = router({
     // Check if user has accepted consents

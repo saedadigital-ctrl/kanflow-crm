@@ -17,7 +17,6 @@
         "client/src/*"
       ]
     },
-    "rootDir": "./server",
     "sourceMap": false,
     "esModuleInterop": true,
     "strict": false,
@@ -26,10 +25,14 @@
     "noImplicitAny": false
   },
   "include": [
-    "server/**/*"
+    "server/**/*",
+    "shared/**/*",
+    "drizzle/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "client"
   ]
 }
+

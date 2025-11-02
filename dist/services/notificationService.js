@@ -1,4 +1,4 @@
-import { createNotification, getNotificationPreferences, notificationEmitter } from '../db';
+import { createNotification, getNotificationPreferences, notificationEmitter } from "../db.js";
 /**
  * Notification Service - Gerencia criação e envio de notificações
  */

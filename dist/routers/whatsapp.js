@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure } from "../_core/trpc.js";
 import { TRPCError } from "@trpc/server";
-import * as db from "../db";
+import * as db from "../db.js";
 import { nanoid } from "nanoid";
 export const whatsappRouter = router({
     // ==================== ACCOUNTS ====================

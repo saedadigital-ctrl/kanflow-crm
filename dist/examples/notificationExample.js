@@ -4,7 +4,7 @@
  * Este arquivo demonstra como integrar notificações em diferentes
  * eventos da aplicação (WhatsApp, Kanban, Contatos, etc)
  */
-import { NotificationService } from '../services/notificationService';
+import { NotificationService } from "../services/notificationService.js";
 // ============================================
 // EXEMPLO 1: Notificação de Nova Mensagem WhatsApp
 // ============================================

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc";
-import { getOrganizationLicense, getOrganizationWhatsappAccounts, getOrganizationConversations, getConversationMessages, createWhatsappAccount, updateWhatsappAccount, updateWhatsappConversation, createWhatsappMessage, getOrganization, createAuditLog, logUsage, } from "../db";
+import { protectedProcedure, router } from "../_core/trpc.js";
+import { getOrganizationLicense, getOrganizationWhatsappAccounts, getOrganizationConversations, getConversationMessages, createWhatsappAccount, updateWhatsappAccount, updateWhatsappConversation, createWhatsappMessage, getOrganization, createAuditLog, logUsage, } from "../db.js";
 import { nanoid } from "nanoid";
 export const clientRouter = router({
     /**

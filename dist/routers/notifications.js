@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { protectedProcedure, router } from '../_core/trpc';
-import { getUserNotifications, markNotificationAsRead, markNotificationsAsRead, getNotificationPreferences, upsertNotificationPreferences, countUnreadNotifications } from '../db';
+import { protectedProcedure, router } from "../_core/trpc.js";
+import { getUserNotifications, markNotificationAsRead, markNotificationsAsRead, getNotificationPreferences, upsertNotificationPreferences, countUnreadNotifications } from "../db.js";
 export const notificationsRouter = router({
     /**
      * Obter notificações do usuário

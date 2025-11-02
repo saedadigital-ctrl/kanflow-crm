@@ -1,4 +1,4 @@
-import { createAuditLog } from "../db";
+import { createAuditLog } from "../db.js";
 /**
  * Tipos de eventos auditáveis
  */

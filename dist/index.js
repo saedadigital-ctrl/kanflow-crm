@@ -1,2 +1,2 @@
 // Auto-generated entry stub
-import './_core/index.js';
+import './server/_core/index.js';
