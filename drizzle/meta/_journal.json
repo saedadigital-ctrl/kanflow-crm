@@ -64,6 +64,13 @@
       "when": 1762031517065,
       "tag": "0008_hot_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1762092245386,
+      "tag": "0009_solid_black_crow",
+      "breakpoints": true
     }
   ]
 }
