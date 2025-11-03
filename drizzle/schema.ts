@@ -71,3 +71,118 @@ export const messages = mysqlTable("messages", {
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = typeof messages.$inferInsert;
 
+// ============================================
+// MULTI-TENANT TABLES
+// ============================================
+
+/**
+ * Organizations - Multi-tenant support
+ */
+export const organizations = mysqlTable("organizations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  logoUrl: text("logoUrl"),
+  website: varchar("website", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  postalCode: varchar("postalCode", { length: 20 }),
+  
+  // Metadata
+  plan: varchar("plan", { length: 50 }).default("starter"), // starter, professional, enterprise
+  status: varchar("status", { length: 50 }).default("active"), // active, trialing, suspended, canceled
+  maxUsers: int("maxUsers").default(5),
+  maxContacts: int("maxContacts").default(1000),
+  maxConversations: int("maxConversations").default(10000),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = typeof organizations.$inferInsert;
+
+/**
+ * Organization Members - User roles per organization
+ */
+export const organizationMembers = mysqlTable("organization_members", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  role: varchar("role", { length: 50 }).default("member").notNull(), // owner, admin, member, viewer
+  status: varchar("status", { length: 50 }).default("active"), // active, invited, suspended
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type OrganizationMember = typeof organizationMembers.$inferSelect;
+export type InsertOrganizationMember = typeof organizationMembers.$inferInsert;
+
+/**
+ * Organization Invites - Pending invitations
+ */
+export const organizationInvites = mysqlTable("organization_invites", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: varchar("role", { length: 50 }).default("member").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type OrganizationInvite = typeof organizationInvites.$inferSelect;
+export type InsertOrganizationInvite = typeof organizationInvites.$inferInsert;
+
+
+// ============================================
+// WHATSAPP TABLES
+// ============================================
+
+/**
+ * WhatsApp Configurations
+ */
+export const whatsappConfigs = mysqlTable("whatsapp_configs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  phoneNumber: varchar("phoneNumber", { length: 20 }).notNull(),
+  displayName: varchar("displayName", { length: 255 }),
+  accessToken: text("accessToken"),
+  businessAccountId: varchar("businessAccountId", { length: 255 }),
+  phoneNumberId: varchar("phoneNumberId", { length: 255 }),
+  connected: boolean("connected").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappConfig = typeof whatsappConfigs.$inferSelect;
+export type InsertWhatsappConfig = typeof whatsappConfigs.$inferInsert;
+
+/**
+ * Conversations - Chat history
+ */
+export const conversations = mysqlTable("conversations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  contactId: varchar("contactId", { length: 64 }).notNull(),
+  lastSnippet: text("lastSnippet"),
+  unreadCount: int("unreadCount").default(0),
+  status: varchar("status", { length: 50 }).default("active"),
+  lastMessageAt: timestamp("lastMessageAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+

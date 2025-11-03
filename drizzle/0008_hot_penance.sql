@@ -1,1 +1,0 @@
-ALTER TABLE `notification_preferences` MODIFY COLUMN `channels` text;

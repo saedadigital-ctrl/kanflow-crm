@@ -6,6 +6,8 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { nanoid } from "nanoid";
+import { organizationsRouter } from "./routers/organizations";
+import { whatsappRouter } from "./routers/whatsapp";
 
 // Pipeline Router
 const pipelineRouter = router({
@@ -175,6 +177,8 @@ export const appRouter = router({
   messages: messagesRouter,
   dashboard: dashboardRouter,
   ai: aiRouter,
+  org: organizationsRouter,
+  whatsapp: whatsappRouter,
 });
 
 export type AppRouter = typeof appRouter;
