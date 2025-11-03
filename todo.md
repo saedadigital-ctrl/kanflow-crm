@@ -29,6 +29,7 @@
 
 ## Planned Features 🔜
 
+- [x] Implementar abas (Tabs) na página de Login com 3 seções: Entrar, Criar Conta, Recuperar Senha
 - [ ] Integração WhatsApp Business API
 - [ ] Envio/recebimento de mensagens
 - [ ] Webhooks WhatsApp
