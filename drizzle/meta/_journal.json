@@ -15,6 +15,13 @@
       "when": 1762205556583,
       "tag": "0001_absurd_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1762206684090,
+      "tag": "0002_yellow_captain_universe",
+      "breakpoints": true
     }
   ]
 }

@@ -8,6 +8,7 @@ import * as db from "./db";
 import { nanoid } from "nanoid";
 import { organizationsRouter } from "./routers/organizations";
 import { whatsappRouter } from "./routers/whatsapp";
+import { billingRouter } from "./routers/billing";
 
 // Pipeline Router
 const pipelineRouter = router({
@@ -179,6 +180,7 @@ export const appRouter = router({
   ai: aiRouter,
   org: organizationsRouter,
   whatsapp: whatsappRouter,
+  billing: billingRouter,
 });
 
 export type AppRouter = typeof appRouter;

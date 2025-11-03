@@ -186,3 +186,88 @@ export const conversations = mysqlTable("conversations", {
 export type Conversation = typeof conversations.$inferSelect;
 export type InsertConversation = typeof conversations.$inferInsert;
 
+
+
+// ============================================
+// BILLING TABLES
+// ============================================
+
+/**
+ * Subscriptions - Planos de assinatura
+ */
+export const subscriptions = mysqlTable("subscriptions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  plan: varchar("plan", { length: 50 }).notNull(), // starter, professional, enterprise
+  status: varchar("status", { length: 50 }).default("active"), // active, trialing, canceled, past_due
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  canceledAt: timestamp("canceledAt"),
+  trialEndsAt: timestamp("trialEndsAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+/**
+ * Invoices - Faturas
+ */
+export const invoices = mysqlTable("invoices", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  subscriptionId: varchar("subscriptionId", { length: 64 }),
+  stripeInvoiceId: varchar("stripeInvoiceId", { length: 255 }),
+  amount: int("amount").notNull(), // em centavos
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  status: varchar("status", { length: 50 }).default("draft"), // draft, open, paid, void, uncollectible
+  paidAt: timestamp("paidAt"),
+  dueDate: timestamp("dueDate"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+
+/**
+ * Payment Methods - Métodos de pagamento
+ */
+export const paymentMethods = mysqlTable("payment_methods", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  stripePaymentMethodId: varchar("stripePaymentMethodId", { length: 255 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // card, bank_account
+  brand: varchar("brand", { length: 50 }), // visa, mastercard, etc
+  last4: varchar("last4", { length: 4 }),
+  expiryMonth: int("expiryMonth"),
+  expiryYear: int("expiryYear"),
+  isDefault: boolean("isDefault").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+export type InsertPaymentMethod = typeof paymentMethods.$inferInsert;
+
+/**
+ * Usage - Uso de recursos
+ */
+export const usage = mysqlTable("usage", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  month: varchar("month", { length: 7 }).notNull(), // YYYY-MM
+  contactsCount: int("contactsCount").default(0),
+  messagesCount: int("messagesCount").default(0),
+  conversationsCount: int("conversationsCount").default(0),
+  usersCount: int("usersCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Usage = typeof usage.$inferSelect;
+export type InsertUsage = typeof usage.$inferInsert;
+
