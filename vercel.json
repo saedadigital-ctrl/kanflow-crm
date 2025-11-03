@@ -2,13 +2,25 @@
   "version": 2,
   "buildCommand": "pnpm build",
   "outputDirectory": "dist/public",
-  "public": "dist/public",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret",
+    "VITE_APP_ID": "@vite_app_id",
+    "OAUTH_SERVER_URL": "@oauth_server_url",
+    "VITE_OAUTH_PORTAL_URL": "@vite_oauth_portal_url",
+    "VITE_APP_TITLE": "@vite_app_title",
+    "VITE_APP_LOGO": "@vite_app_logo",
+    "BUILT_IN_FORGE_API_URL": "@built_in_forge_api_url",
+    "BUILT_IN_FORGE_API_KEY": "@built_in_forge_api_key"
+  },
+  "routes": [
     {
-      "source": "/:path*",
-      "destination": "/index.html"
+      "src": "^/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
