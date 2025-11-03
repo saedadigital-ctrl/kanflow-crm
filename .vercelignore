@@ -43,3 +43,9 @@ turbo.json
 # Keep dist for deployment
 !dist/
 
+# Remove server files
+server.js
+server.ts
+api/
+dist/index.js
+
