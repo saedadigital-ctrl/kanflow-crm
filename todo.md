@@ -21,6 +21,7 @@
 - [x] Frase persuasiva atualizada (removido WhatsApp)
 - [x] Imagens profissionais adicionadas (CRM Dashboard, Automation Workflow, Team Collaboration)
 - [x] Seção de imagens integrada na landing page
+- [x] Logo KanFlow adicionado na seção hero
 
 ## Bugs & Issues
 
