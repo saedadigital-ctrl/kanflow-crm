@@ -391,8 +391,13 @@ export default function LandingPageShowcase() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2025 {APP_TITLE}. Todos os direitos reservados.</p>
+          <div className="border-t border-gray-800 pt-8">
+            <div className="text-center text-sm mb-4">
+              <p>&copy; 2025 {APP_TITLE}. Todos os direitos reservados.</p>
+            </div>
+            <div className="text-center text-xs text-gray-500">
+              <p>Construído pelo <a href="https://aedadigital.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Studio AEDA Digital</a></p>
+            </div>
           </div>
         </div>
       </footer>
