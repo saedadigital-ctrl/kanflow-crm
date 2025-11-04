@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { toast } from "sonner";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -10,9 +11,20 @@ export default function Home() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
+      toast.success("Bem-vindo de volta!", {
+        description: `Você está autenticado como ${user?.name || "usuário"}`,
+        duration: 3000,
+      });
       setLocation("/dashboard");
     }
-  }, [loading, isAuthenticated, setLocation]);
+  }, [loading, isAuthenticated, setLocation, user]);
+
+  const handleLogin = () => {
+    const toastId = toast.loading("Redirecionando para login...");
+    setTimeout(() => {
+      window.location.href = getLoginUrl();
+    }, 500);
+  };
 
   if (loading) {
     return (
@@ -40,12 +52,13 @@ export default function Home() {
             <Button
               size="lg"
               className="w-full"
-              onClick={() => {
-                window.location.href = getLoginUrl();
-              }}
+              onClick={handleLogin}
             >
               Entrar na Plataforma
             </Button>
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              Você receberá uma notificação quando fizer login
+            </p>
           </div>
 
           <div className="pt-4 border-t border-border">
