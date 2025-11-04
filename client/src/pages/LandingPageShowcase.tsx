@@ -118,8 +118,11 @@ export default function LandingPageShowcase() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src={APP_LOGO} alt={APP_TITLE} className="h-10 w-10 rounded-lg" />
-            <span className="text-xl font-bold">{APP_TITLE}</span>
+            <img src={APP_LOGO} alt={APP_TITLE} className="h-12 w-12 rounded-lg shadow-md" />
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-gray-900">{APP_TITLE}</span>
+              <span className="text-xs text-blue-600 font-semibold">Fluxo Inteligente de Vendas</span>
+            </div>
           </div>
           <Button onClick={() => window.location.href = getLoginUrl()}>
             Entrar
