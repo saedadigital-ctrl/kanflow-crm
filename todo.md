@@ -18,6 +18,9 @@
 - [x] NotificationService e routers tRPC
 - [x] Hook useNotifications e componente NotificationBell
 - [x] Página NotificationPreferences básica
+- [x] Frase persuasiva atualizada (removido WhatsApp)
+- [x] Imagens profissionais adicionadas (CRM Dashboard, Automation Workflow, Team Collaboration)
+- [x] Seção de imagens integrada na landing page
 
 ## Bugs & Issues
 

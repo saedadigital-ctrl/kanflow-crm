@@ -137,7 +137,7 @@ export default function LandingPageShowcase() {
             Ganhe tempo em cada etapa do seu funil
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Veja como a integração com WhatsApp e as automações funcionam em 3 passos. Organize seus leads, automatize follow-ups e aumente suas vendas.
+            Integre seus canais de comunicação, automatize processos e acelere seu crescimento. Organize leads, qualifique com IA e feche mais negócios.
           </p>
           <div className="flex gap-4 justify-center">
             <Button size="lg" onClick={() => window.location.href = getLoginUrl()}>
@@ -148,6 +148,18 @@ export default function LandingPageShowcase() {
                 <span>Ver Demo</span>
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Hero Images Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <img src="/hero-crm-dashboard.png" alt="CRM Dashboard" className="rounded-lg shadow-2xl w-full" />
+          </div>
+          <div>
+            <img src="/automation-workflow.png" alt="Automation Workflow" className="rounded-lg shadow-2xl w-full" />
           </div>
         </div>
       </section>
@@ -334,6 +346,39 @@ export default function LandingPageShowcase() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* Team Collaboration Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Trabalhe em Equipe com Eficiência</h2>
+            <p className="text-lg text-gray-600 mb-6">
+              Colabore com sua equipe em tempo real, compartilhe informacoes de contatos e acompanhe o progresso de cada negocio. O KanFlow foi projetado para equipes que querem crescer juntas.
+            </p>
+            <ul className="space-y-3 text-gray-700">
+              <li className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Permissoes granulares por usuario</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Historico de atividades e auditoria</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Notificacoes em tempo real</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Integracao com ferramentas populares</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <img src="/team-collaboration.png" alt="Team Collaboration" className="rounded-lg shadow-2xl w-full" />
+          </div>
         </div>
       </section>
 
