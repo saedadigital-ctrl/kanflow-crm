@@ -134,14 +134,14 @@ export default function LandingPageShowcase() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center space-y-6">
           <h1 className="text-5xl sm:text-6xl font-bold text-gray-900">
-            CRM Profissional para WhatsApp
+            Ganhe tempo em cada etapa do seu funil
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Gerencie seus contatos, automatize conversas e aumente suas vendas com inteligência artificial
+            Veja como a integração com WhatsApp e as automações funcionam em 3 passos. Organize seus leads, automatize follow-ups e aumente suas vendas.
           </p>
           <div className="flex gap-4 justify-center">
             <Button size="lg" onClick={() => window.location.href = getLoginUrl()}>
-              Começar Agora <ArrowRight className="ml-2 h-5 w-5" />
+              Ativar meu funil <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Link href="/dev-login">
               <Button size="lg" variant="outline" asChild>
@@ -169,8 +169,8 @@ export default function LandingPageShowcase() {
       {/* Features Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Funcionalidades Completas</h2>
-          <p className="text-xl text-gray-600">Tudo que você precisa para gerenciar seus clientes</p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Funcionalidades que Vendem</h2>
+          <p className="text-xl text-gray-600">Tudo que você precisa para organizar seu funil e aumentar conversões</p>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
