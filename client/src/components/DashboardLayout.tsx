@@ -76,24 +76,24 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             const isActive = location === item.path;
 
             return (
-              <Link key={item.label} href={item.path}>
-                <a
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:bg-gray-800"
-                  }`}
-                >
-                  {item.icon}
-                  {sidebarOpen && (
-                    <span className="text-sm font-medium">{item.label}</span>
-                  )}
-                  {item.badge && sidebarOpen && (
-                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-                      {item.badge}
-                    </span>
-                  )}
-                </a>
+              <Link
+                key={item.label}
+                href={item.path}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-300 hover:bg-gray-800"
+                }`}
+              >
+                {item.icon}
+                {sidebarOpen && (
+                  <span className="text-sm font-medium">{item.label}</span>
+                )}
+                {item.badge && sidebarOpen && (
+                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

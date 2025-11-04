@@ -5,23 +5,37 @@ import { Route, Switch, Redirect, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useAuth } from "./_core/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 
-// Pages
+// Public pages (loaded immediately)
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Contacts from "./pages/Contacts";
-import Pipeline from "./pages/Pipeline";
-import Chats from "./pages/Chats";
-import Settings from "./pages/Settings";
 import DevLogin from "./pages/DevLogin";
 import LandingPageShowcase from "./pages/LandingPageShowcase";
-import ConversationManager from "./pages/ConversationManager";
-import WhatsAppIntegration from "./pages/WhatsAppIntegration";
-import AIAgents from "./pages/AIAgents";
-import Automations from "./pages/Automations";
-import AdminPanel from "./pages/AdminPanel";
+
+// Protected pages (lazy loaded)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Contacts = lazy(() => import("./pages/Contacts"));
+const Pipeline = lazy(() => import("./pages/Pipeline"));
+const Chats = lazy(() => import("./pages/Chats"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ConversationManager = lazy(() => import("./pages/ConversationManager"));
+const WhatsAppIntegration = lazy(() => import("./pages/WhatsAppIntegration"));
+const AIAgents = lazy(() => import("./pages/AIAgents"));
+const Automations = lazy(() => import("./pages/Automations"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+
+// Loading component
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-gray-600">Carregando...</p>
+      </div>
+    </div>
+  );
+}
 
 // Protected Route Component
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -35,10 +49,14 @@ function ProtectedRoute({ component: Component, ...rest }: any) {
   }, [isAuthenticated, loading, setLocation]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
+    return <PageLoader />;
   }
 
-  return isAuthenticated ? <Component {...rest} /> : null;
+  return isAuthenticated ? (
+    <Suspense fallback={<PageLoader />}>
+      <Component {...rest} />
+    </Suspense>
+  ) : null;
 }
 
 function Router() {
@@ -49,7 +67,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/dev-login" component={DevLogin} />
 
-      {/* Protected Routes */}
+      {/* Protected Routes with lazy loading */}
       <Route path="/dashboard" component={(props: any) => <ProtectedRoute component={Dashboard} {...props} />} />
       <Route path="/contacts" component={(props: any) => <ProtectedRoute component={Contacts} {...props} />} />
       <Route path="/pipeline" component={(props: any) => <ProtectedRoute component={Pipeline} {...props} />} />

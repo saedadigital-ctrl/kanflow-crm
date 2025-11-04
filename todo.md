@@ -21,11 +21,9 @@
 
 ## Bugs & Issues
 
-- [ ] TypeScript errors em Organizations.tsx (isLoading property)
+- [x] TypeScript errors em Organizations.tsx (isLoading property)
   - Arquivo: client/src/pages/admin/Organizations.tsx
-  - Linhas: 375, 376
-  - Descrição: Property 'isLoading' não existe em UseTRPCMutationResult
-  - Status: Requer correção de tipos tRPC
+  - Status: RESOLVIDO - Arquivo removido durante refatoração, sem erros de TypeScript no projeto
 
 ## Planned Features 🔜
 
