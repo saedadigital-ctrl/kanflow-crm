@@ -1,0 +1,10 @@
+# Force Manus to rebuild from scratch
+# This file triggers a fresh build without using cached layers
+# Generated: 2025-01-03
+# Reason: Cache corruption recovery
+# Version: 1.0.1+rebuild-fresh
+
+FORCE_REBUILD=true
+NO_CACHE=true
+FRESH_BUILD=true
+

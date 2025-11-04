@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-crm-kanban",
-  "version": "1.0.0",
+  "version": "1.0.1+rebuild-fresh",
   "type": "module",
   "license": "MIT",
   "scripts": {

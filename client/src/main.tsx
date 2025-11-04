@@ -8,6 +8,11 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+// Force rebuild: 2025-01-03 - Fresh build without cache
+// Version: 1.0.1+rebuild-fresh
+const BUILD_ID = "rebuild-fresh-2025-01-03";
+console.log(`[Build] ${BUILD_ID}`);
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
@@ -52,6 +57,7 @@ const trpcClient = trpc.createClient({
   ],
 });
 
+console.log(`[App] Initializing with build ${BUILD_ID}`);
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
