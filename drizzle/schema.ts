@@ -71,3 +71,203 @@ export const messages = mysqlTable("messages", {
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = typeof messages.$inferInsert;
 
+// ============================================
+// MULTI-TENANT TABLES
+// ============================================
+
+/**
+ * Organizations - Multi-tenant support
+ */
+export const organizations = mysqlTable("organizations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  logoUrl: text("logoUrl"),
+  website: varchar("website", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  postalCode: varchar("postalCode", { length: 20 }),
+  
+  // Metadata
+  plan: varchar("plan", { length: 50 }).default("starter"), // starter, professional, enterprise
+  status: varchar("status", { length: 50 }).default("active"), // active, trialing, suspended, canceled
+  maxUsers: int("maxUsers").default(5),
+  maxContacts: int("maxContacts").default(1000),
+  maxConversations: int("maxConversations").default(10000),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = typeof organizations.$inferInsert;
+
+/**
+ * Organization Members - User roles per organization
+ */
+export const organizationMembers = mysqlTable("organization_members", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  role: varchar("role", { length: 50 }).default("member").notNull(), // owner, admin, member, viewer
+  status: varchar("status", { length: 50 }).default("active"), // active, invited, suspended
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type OrganizationMember = typeof organizationMembers.$inferSelect;
+export type InsertOrganizationMember = typeof organizationMembers.$inferInsert;
+
+/**
+ * Organization Invites - Pending invitations
+ */
+export const organizationInvites = mysqlTable("organization_invites", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: varchar("role", { length: 50 }).default("member").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type OrganizationInvite = typeof organizationInvites.$inferSelect;
+export type InsertOrganizationInvite = typeof organizationInvites.$inferInsert;
+
+
+// ============================================
+// WHATSAPP TABLES
+// ============================================
+
+/**
+ * WhatsApp Configurations
+ */
+export const whatsappConfigs = mysqlTable("whatsapp_configs", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  phoneNumber: varchar("phoneNumber", { length: 20 }).notNull(),
+  displayName: varchar("displayName", { length: 255 }),
+  accessToken: text("accessToken"),
+  businessAccountId: varchar("businessAccountId", { length: 255 }),
+  phoneNumberId: varchar("phoneNumberId", { length: 255 }),
+  connected: boolean("connected").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type WhatsappConfig = typeof whatsappConfigs.$inferSelect;
+export type InsertWhatsappConfig = typeof whatsappConfigs.$inferInsert;
+
+/**
+ * Conversations - Chat history
+ */
+export const conversations = mysqlTable("conversations", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  contactId: varchar("contactId", { length: 64 }).notNull(),
+  lastSnippet: text("lastSnippet"),
+  unreadCount: int("unreadCount").default(0),
+  status: varchar("status", { length: 50 }).default("active"),
+  lastMessageAt: timestamp("lastMessageAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+
+
+// ============================================
+// BILLING TABLES
+// ============================================
+
+/**
+ * Subscriptions - Planos de assinatura
+ */
+export const subscriptions = mysqlTable("subscriptions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  plan: varchar("plan", { length: 50 }).notNull(), // starter, professional, enterprise
+  status: varchar("status", { length: 50 }).default("active"), // active, trialing, canceled, past_due
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  canceledAt: timestamp("canceledAt"),
+  trialEndsAt: timestamp("trialEndsAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+/**
+ * Invoices - Faturas
+ */
+export const invoices = mysqlTable("invoices", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  subscriptionId: varchar("subscriptionId", { length: 64 }),
+  stripeInvoiceId: varchar("stripeInvoiceId", { length: 255 }),
+  amount: int("amount").notNull(), // em centavos
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  status: varchar("status", { length: 50 }).default("draft"), // draft, open, paid, void, uncollectible
+  paidAt: timestamp("paidAt"),
+  dueDate: timestamp("dueDate"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+
+/**
+ * Payment Methods - Métodos de pagamento
+ */
+export const paymentMethods = mysqlTable("payment_methods", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  stripePaymentMethodId: varchar("stripePaymentMethodId", { length: 255 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // card, bank_account
+  brand: varchar("brand", { length: 50 }), // visa, mastercard, etc
+  last4: varchar("last4", { length: 4 }),
+  expiryMonth: int("expiryMonth"),
+  expiryYear: int("expiryYear"),
+  isDefault: boolean("isDefault").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+export type InsertPaymentMethod = typeof paymentMethods.$inferInsert;
+
+/**
+ * Usage - Uso de recursos
+ */
+export const usage = mysqlTable("usage", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  organizationId: varchar("organizationId", { length: 64 }).notNull(),
+  month: varchar("month", { length: 7 }).notNull(), // YYYY-MM
+  contactsCount: int("contactsCount").default(0),
+  messagesCount: int("messagesCount").default(0),
+  conversationsCount: int("conversationsCount").default(0),
+  usersCount: int("usersCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type Usage = typeof usage.$inferSelect;
+export type InsertUsage = typeof usage.$inferInsert;
+
