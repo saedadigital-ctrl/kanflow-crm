@@ -141,3 +141,14 @@
 - [ ] Integrar componente em página de exemplo
 - [ ] Testar e salvar checkpoint
 
+
+
+## Pipeline de Deployment 🚀
+
+- [ ] Sincronizar código com GitHub
+- [ ] Configurar variáveis de ambiente no Vercel
+- [ ] Conectar repositório GitHub ao Vercel
+- [ ] Fazer deploy em produção no Vercel
+- [ ] Validar deploy e testar funcionalidades
+- [ ] Monitorar logs e performance
+
