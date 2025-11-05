@@ -23,6 +23,7 @@
 - [x] Seção de imagens integrada na landing page
 - [x] Logo KanFlow adicionado na seção hero
 - [x] Logo KanFlow adicionado no rodapé alinhado à esquerda
+- [x] Logo substituído de preto para azul com fundo branco
 
 ## Bugs & Issues
 
