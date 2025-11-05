@@ -24,6 +24,7 @@
 - [x] Logo KanFlow adicionado na seção hero
 - [x] Logo KanFlow adicionado no rodapé alinhado à esquerda
 - [x] Logo substituído de preto para azul com fundo branco
+- [x] Erro CORS corrigido - logo agora usa caminho local (/kanflow-logo-solid.png)
 
 ## Bugs & Issues
 

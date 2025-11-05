@@ -2,9 +2,8 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 export const APP_TITLE = "KanFlow";
 
-export const APP_LOGO =
-  import.meta.env.VITE_APP_LOGO ||
-  "/kanflow-logo-solid.png";
+export const APP_LOGO = "/kanflow-logo-solid.png";
+// Nota: VITE_APP_LOGO foi removido para evitar erros CORS com URLs externas
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {
