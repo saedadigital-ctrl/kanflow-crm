@@ -131,3 +131,13 @@
 - [x] Demo login não redireciona para dashboard após cadastro (CORRIGIDO)
 - [ ] TypeScript errors em páginas removidas (será resolvido na Fase 1)
 
+
+
+## Componente de Avaliação por Estrelas 🌟
+
+- [x] Criar componente StarRating reutilizável
+- [ ] Adicionar schema de banco de dados para avaliações
+- [ ] Criar routers tRPC para gerenciar avaliações
+- [ ] Integrar componente em página de exemplo
+- [ ] Testar e salvar checkpoint
+
