@@ -24,6 +24,8 @@ const WhatsAppIntegration = lazy(() => import("./pages/WhatsAppIntegration"));
 const AIAgents = lazy(() => import("./pages/AIAgents"));
 const Automations = lazy(() => import("./pages/Automations"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const BlogPosts = lazy(() => import("./pages/BlogPosts"));
+const BlogPostEditor = lazy(() => import("./pages/BlogPostEditor"));
 
 // Loading component
 function PageLoader() {
@@ -78,6 +80,9 @@ function Router() {
       <Route path="/automations" component={(props: any) => <ProtectedRoute component={Automations} {...props} />} />
       <Route path="/admin" component={(props: any) => <ProtectedRoute component={AdminPanel} {...props} />} />
       <Route path="/settings" component={(props: any) => <ProtectedRoute component={Settings} {...props} />} />
+      <Route path="/blog" component={(props: any) => <ProtectedRoute component={BlogPosts} {...props} />} />
+      <Route path="/blog/new" component={(props: any) => <ProtectedRoute component={BlogPostEditor} {...props} />} />
+      <Route path="/blog/edit/:id" component={(props: any) => <ProtectedRoute component={BlogPostEditor} {...props} />} />
 
       {/* 404 */}
       <Route path="/404" component={NotFound} />

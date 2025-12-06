@@ -161,3 +161,46 @@ export async function createMessage(message: InsertMessage) {
   return message;
 }
 
+// Blog Posts
+export async function getBlogPosts() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { blogPosts } = await import("../drizzle/schema");
+  return db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+}
+
+export async function getBlogPost(id: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const { blogPosts } = await import("../drizzle/schema");
+  const result = await db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createBlogPost(post: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { blogPosts } = await import("../drizzle/schema");
+  await db.insert(blogPosts).values(post);
+  return post;
+}
+
+export async function updateBlogPost(id: string, updates: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { blogPosts } = await import("../drizzle/schema");
+  await db.update(blogPosts).set(updates).where(eq(blogPosts.id, id));
+  return db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+}
+
+export async function deleteBlogPost(id: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { blogPosts } = await import("../drizzle/schema");
+  await db.delete(blogPosts).where(eq(blogPosts.id, id));
+}

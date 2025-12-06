@@ -271,3 +271,51 @@ export const usage = mysqlTable("usage", {
 export type Usage = typeof usage.$inferSelect;
 export type InsertUsage = typeof usage.$inferInsert;
 
+
+/**
+ * Blog Posts
+ */
+export const blogPosts = mysqlTable("blog_posts", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  featuredImage: text("featuredImage"),
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+  publishedAt: timestamp("publishedAt"),
+  authorId: varchar("authorId", { length: 64 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+});
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
+
+/**
+ * Blog Categories
+ */
+export const blogCategories = mysqlTable("blog_categories", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type BlogCategory = typeof blogCategories.$inferSelect;
+export type InsertBlogCategory = typeof blogCategories.$inferInsert;
+
+/**
+ * Blog Images
+ */
+export const blogImages = mysqlTable("blog_images", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  postId: varchar("postId", { length: 64 }).notNull(),
+  url: text("url").notNull(),
+  alt: varchar("alt", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type BlogImage = typeof blogImages.$inferSelect;
+export type InsertBlogImage = typeof blogImages.$inferInsert;

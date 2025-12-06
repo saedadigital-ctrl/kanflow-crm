@@ -13,6 +13,7 @@ import {
   Bot,
   Zap,
   Shield,
+  FileText,
   MessageCircle,
 } from "lucide-react";
 import { APP_LOGO, APP_TITLE } from "@/const";
@@ -33,6 +34,7 @@ const navItems: NavItem[] = [
   { icon: <MessageSquare className="h-5 w-5" />, label: "WhatsApp", path: "/whatsapp" },
   { icon: <Bot className="h-5 w-5" />, label: "Agentes IA", path: "/ai-agents" },
   { icon: <Zap className="h-5 w-5" />, label: "Automações", path: "/automations" },
+  { icon: <FileText className="h-5 w-5" />, label: "Blog", path: "/blog" },
   { icon: <Shield className="h-5 w-5" />, label: "Admin", path: "/admin" },
   { icon: <Settings className="h-5 w-5" />, label: "Configurações", path: "/settings" },
 ];
