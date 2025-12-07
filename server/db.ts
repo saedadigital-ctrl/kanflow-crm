@@ -204,3 +204,24 @@ export async function deleteBlogPost(id: string) {
   const { blogPosts } = await import("../drizzle/schema");
   await db.delete(blogPosts).where(eq(blogPosts.id, id));
 }
+
+
+// Export db object for compatibility
+export const db = {
+  getDb,
+  upsertUser,
+  getUser,
+  getPipelineStages,
+  createPipelineStage,
+  getContacts,
+  createContact,
+  updateContact,
+  getMessages,
+  createMessage,
+  getBlogPosts,
+  getBlogPost,
+  getBlogPostBySlug: getBlogPost, // Alias for getBlogPost
+  createBlogPost,
+  updateBlogPost,
+  deleteBlogPost,
+};
