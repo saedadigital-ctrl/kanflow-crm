@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 # Copy package files
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
+COPY patches ./patches
 
 # Install dependencies
 RUN npm install -g pnpm
@@ -28,6 +29,7 @@ RUN npm install -g pnpm
 # Copy package files
 COPY package*.json ./
 COPY pnpm-lock.yaml* ./
+COPY patches ./patches
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
