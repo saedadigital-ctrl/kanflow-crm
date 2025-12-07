@@ -1,7 +1,6 @@
 {
   "name": "whatsapp-crm-kanban",
   "version": "1.0.1+rebuild-fresh",
-  "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
