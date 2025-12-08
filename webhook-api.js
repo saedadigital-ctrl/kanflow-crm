@@ -166,6 +166,76 @@ app.get('/api/webhook/properties/:id', async (req, res) => {
   }
 });
 
+// Criar imóvel (para migração)
+app.post('/api/properties', async (req, res) => {
+  try {
+    const property = req.body;
+    
+    const query = `
+      INSERT INTO properties (
+        title, slug, builder, status, address, neighborhood, city,
+        area_min_sqm, area_max_sqm, bedrooms, bathrooms, parking_spaces,
+        price, description, features, images, is_published, is_featured
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    const [result] = await pool.execute(query, [
+      property.title,
+      property.slug,
+      property.builder,
+      property.status,
+      property.address,
+      property.neighborhood,
+      property.city,
+      property.area_min_sqm,
+      property.area_max_sqm,
+      property.bedrooms,
+      property.bathrooms,
+      property.parking_spaces,
+      property.price,
+      property.description,
+      property.features,
+      property.images,
+      property.is_published,
+      property.is_featured
+    ]);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Imóvel criado com sucesso!',
+      propertyId: result.insertId
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao criar imóvel:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erro ao criar imóvel',
+      details: error.message
+    });
+  }
+});
+
+// Limpar tabela de imóveis (para migração)
+app.delete('/api/properties/all', async (req, res) => {
+  try {
+    await pool.execute('DELETE FROM properties');
+    
+    res.json({
+      success: true,
+      message: 'Todos os imóveis foram removidos'
+    });
+    
+  } catch (error) {
+    console.error('❌ Erro ao limpar imóveis:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erro ao limpar imóveis',
+      details: error.message
+    });
+  }
+});
+
 // Rota 404
 app.use((req, res) => {
   res.status(404).json({
